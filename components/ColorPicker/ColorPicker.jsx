@@ -26,12 +26,12 @@ const ColorOption = ({ setColorFunction, logColor, selectedColor }) => {
     >
       <div
         style={{ backgroundColor: selectedColor }}
-        className='w-6 h-6 rounded-full border border-black bg-white'
+        className="w-6 h-6 rounded-full border border-black bg-white"
       ></div>
       <input
-        type='color'
+        type="color"
         ref={colorInputRef}
-        className='absolute  w-0 h-0 opacity-0 cursor-pointer'
+        className="absolute  w-0 h-0 opacity-0 cursor-pointer"
         value={selectedColor} // Set the current color
         onChange={handleColorChange} // Handle changes
       />
@@ -47,8 +47,8 @@ const ColorCategory = ({
   selectedColor,
 }) => {
   return (
-    <div className='flex flex-col gap-1'>
-      <p className='font-semibold text-[12px] '>{category}</p>
+    <div className="flex flex-col gap-1">
+      <p className="font-semibold text-[12px] ">{category}</p>
 
       <ColorOption
         setColorFunction={setColorFunction}
@@ -84,9 +84,9 @@ const ColorPicker = () => {
   return (
     <OptionsWrapper>
       <Title>Choose a 3D model color</Title>
-      <div className='space-y-4 w-full'>
+      <div className="space-y-4 w-full">
         <ColorCategory
-          category='Garment'
+          category="Garment"
           setColorFunction={(color) => {
             setFrontColor(color);
             setBackColor(color);
@@ -98,34 +98,34 @@ const ColorPicker = () => {
           logColor={logColor}
           selectedColor={garmentColor}
         />
-        <div className='flex flex-row justify-between  w-full gap-1'>
+        <div className="flex flex-row justify-between  w-full gap-1">
           <ColorCategory
-            category='Front'
+            category="Front"
             setColorFunction={setFrontColor}
             logColor={logColor}
             selectedColor={frontColor}
           />
           <ColorCategory
-            category='Back'
+            category="Back"
             setColorFunction={setBackColor}
             logColor={logColor}
             selectedColor={backColor}
           />
           <ColorCategory
-            category='Collar'
+            category="Collar"
             setColorFunction={setCollarColor}
             logColor={logColor}
             selectedColor={collarColor}
           />
           <ColorCategory
-            category='Left shoulder'
+            category="Left shoulder"
             setColorFunction={setLeftShoulderColor}
             logColor={logColor}
             selectedColor={leftShoulderColor}
           />
         </div>
         <ColorCategory
-          category='Right shoulder'
+          category="Right shoulder"
           setColorFunction={setRightShoulderColor}
           logColor={logColor}
           selectedColor={rightShoulderColor}
@@ -133,9 +133,9 @@ const ColorPicker = () => {
       </div>
 
       <CustomButton
-        className='mt-5 cursor-pointer w-fit justify-center items-center bg-black text-white'
+        className="mt-5 cursor-pointer w-fit justify-center items-center bg-black text-white"
         onClick={resetColors}
-        text='Reset colors'
+        text="Reset colors"
       />
     </OptionsWrapper>
   );

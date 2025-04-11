@@ -286,14 +286,14 @@ const UploadCard = ({ isActive }) => {
     >
       <div className={twMerge("w-[310px] h-[400px] overflow-hidden")}>
         <Title>Upload Image/SVG</Title>
-        <p className='font-medium text-md mt-1 text-gray-400'>
+        <p className="font-medium text-md mt-1 text-gray-400">
           Upload an image and move it on the template below to display on the
           model
         </p>
 
         {/* Trigger file input on custom button click */}
         <CustomButton
-          text='Image/SVG'
+          text="Image/SVG"
           className={"mt-4"}
           icon={<FileUpload />}
           onClick={() => fileInputRef.current?.click()}
@@ -301,10 +301,10 @@ const UploadCard = ({ isActive }) => {
 
         {/* Hidden file input */}
         <input
-          type='file'
-          accept='image/*'
+          type="file"
+          accept="image/*"
           ref={fileInputRef}
-          className='hidden'
+          className="hidden"
           onChange={handleFileChange}
         />
 
@@ -315,20 +315,20 @@ const UploadCard = ({ isActive }) => {
         >
           {" "}
           <img
-            src='uploadposition.png'
-            alt='Template'
-            className='w-full pointer-events-none absolute max-h-[230px] -top-10 left-0'
+            src="uploadposition.png"
+            alt="Template"
+            className="w-full pointer-events-none absolute max-h-[230px] -top-10 left-0"
           />
           <canvas
             ref={canvasRef}
-            id='canvas'
-            className=' max-h-[230px] max-w-[310px]  '
+            id="canvas"
+            className=" max-h-[230px] max-w-[310px]  "
           ></canvas>
           <img
-            id='deleteIcon'
-            src='/icons/Icon.png'
-            className='hidden'
-            alt='delete icon'
+            id="deleteIcon"
+            src="/icons/Icon.png"
+            className="hidden"
+            alt="delete icon"
           />
         </div>
       </div>

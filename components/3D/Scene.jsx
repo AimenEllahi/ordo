@@ -1,14 +1,25 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Environment, OrbitControls, Stage } from "@react-three/drei";
+import {
+  Environment,
+  OrbitControls,
+  Stage,
+  useProgress,
+  Html,
+} from "@react-three/drei";
 import { RepeatWrapping, CanvasTexture } from "three";
 import NewShirt from "./NewShirt";
 import useImageStore from "@/store/useImageStore";
 import Model from "./T-shirt_anim";
+import Loader from "./Loader";
+import useBackgroundStore from "@/store/useBackgroundStore";
+
 export default function Scene() {
   const { textureUrl } = useImageStore();
   const [textures, setTextures] = useState({});
+  const { backgroundColor, backgroundImage, backgroundType, backgroundRatio } =
+    useBackgroundStore();
 
   useEffect(() => {
     Object.keys(textureUrl).forEach((key) => {
@@ -31,10 +42,38 @@ export default function Scene() {
     });
   }, [textureUrl]);
 
+  // Dynamically adjust the width based on the selected ratio
+  const getCanvasWidth = () => {
+    switch (backgroundRatio) {
+      case "16:9":
+        return "100%"; // Full width for 16:9
+      case "1:1":
+        return "50%"; // Half width for square (1:1 ratio)
+      case "9:16":
+        return "30%"; // Smaller width for 9:16 (portrait mode)
+      default:
+        return "100%"; // Default to full width if ratio is unknown
+    }
+  };
+
   return (
-    <div className=" relative z-1 w-full h-screen">
-      <Canvas>
-        {/* add backgroun color white */}
+    <div
+      className="relative flex justify-center z-1 w-full h-screen"
+      style={{
+        backgroundImage:
+          backgroundRatio !== "16:9" ? `url(/checkered-bg.png)` : null,
+        backgroundSize: "cover",
+      }}
+    >
+      <Canvas
+        style={{
+          width: getCanvasWidth(), // Adjust width based on the selected ratio
+          backgroundColor: backgroundType === "color" ? backgroundColor : null,
+          backgroundImage:
+            backgroundType === "image" ? `url(${backgroundImage})` : null,
+          backgroundSize: "cover",
+        }}
+      >
         <directionalLight
           position={[10, 10, 5]}
           intensity={1}
@@ -44,8 +83,8 @@ export default function Scene() {
         <Environment files={"/env/lebombo_1k.hdr"} />
         <Stage shadows={false} adjustCamera={1.1}>
           <OrbitControls />
-          <Model />
-          {/* <NewShirt textures={textures} /> */}
+          <Suspense fallback={<Loader />}>{/* <Model /> */}</Suspense>
+          <NewShirt textures={textures} />
         </Stage>
       </Canvas>
     </div>

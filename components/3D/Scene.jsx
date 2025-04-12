@@ -18,8 +18,13 @@ import useBackgroundStore from "@/store/useBackgroundStore";
 export default function Scene() {
   const { textureUrl } = useImageStore();
   const [textures, setTextures] = useState({});
-  const { backgroundColor, backgroundImage, backgroundType, backgroundRatio } =
-    useBackgroundStore();
+  const {
+    backgroundColor,
+    backgroundImage,
+    backgroundType,
+    backgroundRatio,
+    cameraAnimation,
+  } = useBackgroundStore();
 
   useEffect(() => {
     Object.keys(textureUrl).forEach((key) => {
@@ -82,7 +87,11 @@ export default function Scene() {
         />
         <Environment files={"/env/lebombo_1k.hdr"} />
         <Stage shadows={false} adjustCamera={1.1}>
-          <OrbitControls />
+          <OrbitControls
+            enableRotate={cameraAnimation === "Rotation"}
+            autoRotate={cameraAnimation === "Rotation"}
+            autoRotateSpeed={5}
+          />
           <Suspense fallback={<Loader />}>{/* <Model /> */}</Suspense>
           <NewShirt textures={textures} />
         </Stage>

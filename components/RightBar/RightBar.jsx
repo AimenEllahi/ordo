@@ -4,37 +4,39 @@ import ArrowUpRight from "../ui/icons/ArrowRight";
 import HandIcon from "../ui/icons/Hand";
 import RotateRight from "../ui/icons/RotateRight";
 import RotateLeft from "../ui/icons/Rotateleft";
+import useBackgroundStore from "@/store/useBackgroundStore";
 
 const RightBar = () => {
-  const [active, setActive] = useState("cursor");
+  const { activeMode, setActiveMode, rotationAngle, setRotationAngle } =
+    useBackgroundStore();
 
   return (
-    //z-10 removed remem..
-    <div className='fixed right-4 items-center justify-center gap-3 top-1/4 -translate-y-1/2 flex flex-col p-2 py-3 rounded-xl shadow-md bg-white'>
+    <div className="fixed z-50 right-4 items-center justify-center gap-3 top-1/4 -translate-y-1/2 flex flex-col p-2 py-3 rounded-xl shadow-md bg-white">
       <button
         className={`p-2 cursor-pointer rounded-lg ${
-          active === "cursor" ? "bg-gray-300" : "bg-white"
+          activeMode === "cursor" ? "bg-gray-300" : "bg-white"
         }`}
-        onClick={() => setActive("cursor")}
+        onClick={() => setActiveMode("cursor")}
       >
-        <ArrowUpRight className='w-5 h-5 ' />
+        <ArrowUpRight className="w-5 h-5 " />
       </button>
 
       <button
         className={`p-2 cursor-pointer rounded-lg ${
-          active === "hand" ? "bg-gray-300" : "bg-white"
+          activeMode === "hand" ? "bg-gray-300" : "bg-white"
         }`}
-        onClick={() => setActive("hand")}
+        onClick={() => setActiveMode("hand")}
       >
-        <HandIcon className='w-5 h-5' />
+        <HandIcon className="w-5 h-5" />
       </button>
 
-      <hr className='border-[1px] w-3/4 border-gray-300 ' />
-      <div className='p-[5px]'>
-        <RotateLeft className='fill-black' />
+      <hr className="border-[1px] w-3/4 border-gray-300 " />
+
+      <div className="p-[5px]">
+        <RotateLeft className="fill-black" />
       </div>
-      <div className='p-[5px]'>
-        <RotateRight className='fill-[#C8C8C8]' />
+      <div className="p-[5px]">
+        <RotateRight className="fill-[#C8C8C8]" />
       </div>
     </div>
   );

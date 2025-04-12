@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import {
   Environment,
@@ -15,6 +15,23 @@ import Model from "./T-shirt_anim";
 import Loader from "./Loader";
 import useBackgroundStore from "@/store/useBackgroundStore";
 
+const RotateModel = ({ modelRef }) => {
+  const { cameraAnimation } = useBackgroundStore();
+  useEffect(() => {
+    if (cameraAnimation === "Rotation") {
+      const interval = setInterval(() => {
+        if (modelRef.current) {
+          modelRef.current.rotation.y += 0.01;
+        }
+      }, 16); // Approximately 60 FPS
+
+      return () => clearInterval(interval); // Cleanup on unmount
+    }
+  }, [cameraAnimation, modelRef]);
+
+  return null;
+};
+
 export default function Scene() {
   const { textureUrl } = useImageStore();
   const [textures, setTextures] = useState({});
@@ -24,7 +41,9 @@ export default function Scene() {
     backgroundType,
     backgroundRatio,
     cameraAnimation,
+    activeMode,
   } = useBackgroundStore();
+  const modelRef = useRef(null);
 
   useEffect(() => {
     Object.keys(textureUrl).forEach((key) => {
@@ -47,7 +66,6 @@ export default function Scene() {
     });
   }, [textureUrl]);
 
-  // Dynamically adjust the width based on the selected ratio
   const getCanvasWidth = () => {
     switch (backgroundRatio) {
       case "16:9":
@@ -68,17 +86,19 @@ export default function Scene() {
         backgroundImage:
           backgroundRatio !== "16:9" ? `url(/checkered-bg.png)` : null,
         backgroundSize: "cover",
+        cursor: activeMode === "hand" ? "grab" : "default",
       }}
     >
       <Canvas
         style={{
-          width: getCanvasWidth(), // Adjust width based on the selected ratio
+          width: getCanvasWidth(),
           backgroundColor: backgroundType === "color" ? backgroundColor : null,
           backgroundImage:
             backgroundType === "image" ? `url(${backgroundImage})` : null,
           backgroundSize: "cover",
         }}
       >
+        <RotateModel modelRef={modelRef} />
         <directionalLight
           position={[10, 10, 5]}
           intensity={1}
@@ -87,13 +107,11 @@ export default function Scene() {
         />
         <Environment files={"/env/lebombo_1k.hdr"} />
         <Stage shadows={false} adjustCamera={1.1}>
-          <OrbitControls
-            enableRotate={cameraAnimation === "Rotation"}
-            autoRotate={cameraAnimation === "Rotation"}
-            autoRotateSpeed={5}
-          />
+          <OrbitControls enabled={activeMode === "hand"} />
           <Suspense fallback={<Loader />}>{/* <Model /> */}</Suspense>
-          <NewShirt textures={textures} />
+          <group ref={modelRef}>
+            <NewShirt textures={textures} />
+          </group>
         </Stage>
       </Canvas>
     </div>

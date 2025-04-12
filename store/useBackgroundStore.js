@@ -6,6 +6,9 @@ const useBackgroundStore = create((set) => ({
   backgroundType: "color",
   backgroundRatio: "16:9",
   cameraAnimation: "Static",
+  activeMode: "cursor",
+
+  setActiveMode: (mode) => set({ activeMode: mode }),
   setCameraAnimation: (animation) => set({ cameraAnimation: animation }),
   setBackgroundRatio: (ratio) => set({ backgroundRatio: ratio }),
   setBackgroundType: (type) => set({ backgroundType: type }),

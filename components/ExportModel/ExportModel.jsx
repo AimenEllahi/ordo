@@ -6,7 +6,7 @@ import Share from "../ui/icons/Share";
 import CustomButton from "../ui/CustomButton";
 import useExportStore from "@/store/useExportStore";
 
-const ExportModel = ({ isOpen, onClose }) => {
+const ExportModel = ({ isOpen, onClose, formatHandlers }) => {
   const { selectedFormat, setSelectedFormat } = useExportStore();
 
   const formats = [
@@ -33,20 +33,9 @@ const ExportModel = ({ isOpen, onClose }) => {
   ];
 
   const handleDownload = () => {
-    if (selectedFormat === "JPEG" || selectedFormat === "PNG") {
-      downloadImage(selectedFormat);
-    } else if (selectedFormat === "MP4" || selectedFormat === "MOV") {
-      downloadVideo(selectedFormat);
-    }
+    const handler = formatHandlers[selectedFormat];
+    if (handler) handler();
     onClose();
-  };
-
-  const downloadImage = (format) => {
-    console.log(`Downloading ${format} image...`);
-  };
-
-  const downloadVideo = (format) => {
-    console.log(`Downloading ${format} video...`);
   };
 
   if (!isOpen) return null;
@@ -54,18 +43,15 @@ const ExportModel = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all z-50">
       <div className="bg-white border border-[#D4D4D4] rounded-[20px] p-[50px] w-1/2 shadow-lg text-center relative">
-        <button
-          onClick={onClose}
-          className="absolute cursor-pointer top-6 right-6"
-        >
+        <button onClick={onClose} className="absolute top-6 right-6">
           <Cross className="w-7 h-7" />
         </button>
         <div className="flex flex-col gap-11">
-          <div className="flex flex-col gap-4 justify-between items-center">
-            <h2 className="text-[31px] leading-[100%] font-bold font-helvetica-button">
+          <div className="flex flex-col gap-4 items-center">
+            <h2 className="text-[31px] font-bold font-helvetica-button">
               EXPORT YOUR RESULT
             </h2>
-            <p className="font-helvetica-button text-[12px] !font-light text-[#818181] text-center">
+            <p className="text-[12px] font-light text-[#818181] text-center">
               *Make sure you selected the correct Ratio before downloading
             </p>
           </div>
@@ -91,15 +77,14 @@ const ExportModel = ({ isOpen, onClose }) => {
             ))}
           </div>
         </div>
-
         <div className="mt-[26px] mx-auto w-fit">
           <CustomButton
-            text={"Download "}
+            text={`Download ${selectedFormat}`}
             icon={<Share />}
             className={"text-[16px]"}
             variant={2}
             onClick={handleDownload}
-          ></CustomButton>
+          />
         </div>
       </div>
     </div>

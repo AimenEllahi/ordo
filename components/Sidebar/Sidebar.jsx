@@ -22,7 +22,7 @@ import useImageStore from "@/store/useImageStore";
 const SidebarBtn = ({ children, onClick }) => {
   return (
     <button
-      className='hover:bg-gray-100 cursor-pointer  sidebar-btn !px-5'
+      className="hover:bg-gray-100 cursor-pointer  sidebar-btn !px-5"
       onClick={onClick}
     >
       {children}
@@ -31,7 +31,7 @@ const SidebarBtn = ({ children, onClick }) => {
 };
 const Sidebar = () => {
   const [activeTab, setActiveTab] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { textureUrl } = useImageStore();
   const toggleTab = (tab) => {
     setActiveTab((prevTab) => (prevTab === tab ? null : tab));
@@ -39,11 +39,11 @@ const Sidebar = () => {
 
   return (
     <>
-      <div className='fixed  z-[10] left-4 top-1/8 flex flex-col items-start pointer-events-auto'>
-        <div className='flex gap-4 items-start justify-start'>
-          <div className='bg-white shadow-lg w-fit px-4 py-4 rounded-xl flex flex-col items-center'>
+      <div className="fixed  z-[10] left-4 top-1/8 flex flex-col items-start pointer-events-auto">
+        <div className="flex gap-4 items-start justify-start">
+          <div className="bg-white shadow-lg w-fit px-4 py-4 rounded-xl flex flex-col items-center">
             <SidebarBtn
-              className='sidebar-btn'
+              className="sidebar-btn"
               onClick={() => toggleTab("upload")}
             >
               <UploadIcon
@@ -51,10 +51,10 @@ const Sidebar = () => {
                   activeTab === "upload" ? "fill-black" : "fill-[#8E8E8E]"
                 )}
               />
-              <span className='sidebar-text '>Upload</span>
+              <span className="sidebar-text ">Upload</span>
             </SidebarBtn>
             <SidebarBtn
-              className='sidebar-btn'
+              className="sidebar-btn"
               onClick={() => toggleTab("model")}
             >
               <ModelIcon
@@ -62,10 +62,10 @@ const Sidebar = () => {
                   activeTab === "model" ? "fill-black" : "fill-[#8E8E8E]"
                 )}
               />
-              <span className='sidebar-text '>Model</span>
+              <span className="sidebar-text ">Model</span>
             </SidebarBtn>
             <SidebarBtn
-              className='sidebar-btn'
+              className="sidebar-btn"
               onClick={() => toggleTab("color")}
             >
               <ColorIcon
@@ -73,10 +73,10 @@ const Sidebar = () => {
                   activeTab === "color" ? "fill-black" : "fill-[#8E8E8E]"
                 )}
               />
-              <span className='sidebar-text'>Color</span>
+              <span className="sidebar-text">Color</span>
             </SidebarBtn>
             <SidebarBtn
-              className='sidebar-btn'
+              className="sidebar-btn"
               onClick={() => toggleTab("background")}
             >
               <BackgroundIcon
@@ -84,10 +84,10 @@ const Sidebar = () => {
                   activeTab === "background" ? "fill-black" : "fill-[#8E8E8E]"
                 )}
               />
-              <span className='sidebar-text'>Background</span>
+              <span className="sidebar-text">Background</span>
             </SidebarBtn>
             <SidebarBtn
-              className='sidebar-btn'
+              className="sidebar-btn"
               onClick={() => toggleTab("modelAnimation")}
             >
               <AnimatorIcon
@@ -97,10 +97,10 @@ const Sidebar = () => {
                     : "fill-[#8E8E8E]"
                 )}
               />
-              <span className='sidebar-text '>Model Animation</span>
+              <span className="sidebar-text ">Model Animation</span>
             </SidebarBtn>
             <SidebarBtn
-              className='sidebar-btn'
+              className="sidebar-btn"
               onClick={() => toggleTab("cameraAnimation")}
             >
               <CameraIcon
@@ -110,10 +110,10 @@ const Sidebar = () => {
                     : "fill-[#8E8E8E]"
                 )}
               />
-              <span className='sidebar-text'>Camera Animation</span>
+              <span className="sidebar-text">Camera Animation</span>
             </SidebarBtn>
             <SidebarBtn
-              className='sidebar-btn'
+              className="sidebar-btn"
               onClick={() => toggleTab("ratio")}
             >
               <RatioIcon
@@ -121,10 +121,10 @@ const Sidebar = () => {
                   activeTab === "ratio" ? "fill-black" : "fill-[#8E8E8E]"
                 )}
               />
-              <span className='sidebar-text'>Ratio</span>
+              <span className="sidebar-text">Ratio</span>
             </SidebarBtn>
           </div>
-          <div className='absolute left-full translate-x-[16px]'>
+          <div className="absolute left-full translate-x-[16px]">
             <UploadCard isActive={activeTab === "upload"} />
 
             {activeTab === "model" && <ModelShirt />}
@@ -135,19 +135,7 @@ const Sidebar = () => {
             {activeTab === "ratio" && <SceneRatio />}
           </div>
         </div>
-        <CustomButton
-          onClick={() => setIsModalOpen(true)}
-          text='Export'
-          icon={<ExportIcon />}
-          className='mt-4 w-full flex justify-center items-center'
-          variant={2}
-        />
-        {isModalOpen && (
-          <ExportModel
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
-        )}
+
         {/* <div className='fixed bottom-0 items-center left-0 w-screen justify-center flex gap-4'>
           {Object.keys(textureUrl)
             .filter((key) => textureUrl[key] !== null)

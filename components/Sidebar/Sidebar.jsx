@@ -6,8 +6,7 @@ import BackgroundIcon from "../ui/icons/Background";
 import CameraIcon from "../ui/icons/Camera";
 import RatioIcon from "../ui/icons/Ratio";
 import AnimatorIcon from "../ui/icons/Animator";
-import ExportIcon from "../ui/icons/Export";
-import ExportModel from "../ExportModel/ExportModel";
+
 import UploadCard from "../Upload/UploadCard";
 import ModelShirt from "../ModelShirt/Model";
 import ColorPicker from "../ColorPicker/ColorPicker";
@@ -16,7 +15,7 @@ import ModelAnimation from "../ModelAnimation/ModelAnimation";
 import CameraAnimationSelector from "../CameraAnimator/CameraAnimator";
 import SceneRatio from "../SceneRatio/Sceneratio";
 import { cn } from "@/lib/utils";
-import CustomButton from "../ui/CustomButton";
+
 import useImageStore from "@/store/useImageStore";
 
 const SidebarBtn = ({ children, onClick }) => {

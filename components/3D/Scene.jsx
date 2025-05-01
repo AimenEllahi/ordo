@@ -148,12 +148,49 @@ export default function Scene() {
     }, 100);
   };
 
+  const recordVideoFromCanvas = (format) => {
+    requestAnimationFrame(() => {
+      const canvas = document.querySelector("#canvas-container canvas");
+
+      if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        console.error("Canvas element not found or invalid.");
+        return;
+      }
+
+      if (typeof canvas.captureStream !== "function") {
+        console.error("captureStream() is not supported on this canvas.");
+        return;
+      }
+
+      const stream = canvas.captureStream(30); // 30 FPS
+      const chunks = [];
+      const recorder = new MediaRecorder(stream, {
+        mimeType: "video/webm;codecs=vp9",
+      });
+
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: "video/webm" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `export-video.${format.toLowerCase()}`;
+        a.click();
+      };
+
+      recorder.start();
+      setTimeout(() => recorder.stop(), 5000);
+    });
+  };
+
   const handleMP4Download = () => {
-    console.log("MP4 video export coming soon!");
+    console.log("Recording MP4 video...");
+    recordVideoFromCanvas("MP4");
   };
 
   const handleMOVDownload = () => {
-    console.log("MOV video export coming soon!");
+    console.log("Recording MOV video...");
+    recordVideoFromCanvas("MOV");
   };
 
   return (
@@ -204,7 +241,7 @@ export default function Scene() {
         onClick={() => setIsModalOpen(true)}
         text="Export"
         icon={<ExportIcon />}
-        className="absolute bottom-2 mt-4 left-8 flex justify-center items-center"
+        className="absolute bottom-[20%] mt-4 left-6 flex justify-center items-center"
         variant={2}
         disabled={!modelLoaded}
       />

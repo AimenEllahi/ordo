@@ -3,10 +3,11 @@ import React from "react";
 import Title from "../ui/title";
 import OptionsWrapper from "../ui/OptionsWrapper";
 import OptionCard from "../ui/OptionCard";
-import useBackgroundStore from "@/store/useBackgroundStore";
+import useHistoryStore from "@/store/useHistoryStore"; // ✅ replace import
 
 const CameraAnimationSelector = () => {
-  const { cameraAnimation, setCameraAnimation } = useBackgroundStore();
+  const { state, setState } = useHistoryStore();
+  const { cameraAnimation } = state;
 
   const shirtImage = "shirt.png";
 
@@ -18,7 +19,7 @@ const CameraAnimationSelector = () => {
           <OptionCard
             key={option}
             name={option}
-            onClick={() => setCameraAnimation(option)}
+            onClick={() => setState({ cameraAnimation: option })}
             selected={cameraAnimation === option}
             imgUrl={shirtImage}
             className={`${

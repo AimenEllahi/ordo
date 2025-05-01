@@ -11,9 +11,12 @@ import CustomButton from "../ui/CustomButton";
 import ExportModel from "../ExportModel/ExportModel";
 import ExportIcon from "../ui/icons/Export";
 import html2canvas from "html2canvas-pro";
+import { useThree } from "@react-three/fiber";
+import useHistoryStore from "@/store/useHistoryStore";
 
 const RotateModel = ({ modelRef }) => {
-  const { cameraAnimation } = useBackgroundStore();
+  const { state } = useHistoryStore();
+  const { cameraAnimation } = state;
 
   useEffect(() => {
     if (cameraAnimation === "Rotation") {
@@ -37,6 +40,7 @@ export default function Scene() {
   const canvasWrapperRef = useRef(null);
   const modelRef = useRef(null);
 
+  const { state } = useHistoryStore();
   const {
     backgroundColor,
     backgroundImage,
@@ -44,7 +48,7 @@ export default function Scene() {
     backgroundRatio,
     cameraAnimation,
     activeMode,
-  } = useBackgroundStore();
+  } = state;
 
   useEffect(() => {
     const textureKeys = Object.keys(textureUrl);
@@ -195,7 +199,7 @@ export default function Scene() {
 
   return (
     <div
-      className="relative flex justify-center z-1 w-full h-screen"
+      className="relative flex justify-center z-1 w-full h-screen "
       style={{
         backgroundImage:
           backgroundRatio !== "16:9" ? `url(/checkered-bg.png)` : null,
@@ -204,6 +208,7 @@ export default function Scene() {
       }}
     >
       <div
+        className="transition-all duration-300 ease-in-out"
         ref={canvasWrapperRef}
         id="canvas-container"
         style={{
@@ -226,7 +231,8 @@ export default function Scene() {
           />
           <Environment files={"/env/lebombo_1k.hdr"} />
           <Stage shadows={false} adjustCamera={1.1}>
-            <OrbitControls enabled={activeMode === "hand"} />
+            <OrbitControlsWrapper mode={activeMode} />
+
             <Suspense fallback={<Loader />}>
               <group ref={modelRef}>
                 <NewShirt textures={textures} />
@@ -262,3 +268,27 @@ export default function Scene() {
     </div>
   );
 }
+
+const OrbitControlsWrapper = ({ mode }) => {
+  const { camera, gl } = useThree();
+
+  useEffect(() => {
+    camera.position.set(0, 0, 5);
+  }, [camera]);
+
+  return (
+    <OrbitControls
+      args={[camera, gl.domElement]}
+      enableRotate={mode === "cursor"}
+      enablePan={mode === "hand"}
+      enableZoom={false}
+      panSpeed={1.2}
+      screenSpacePanning={true}
+      mouseButtons={{
+        LEFT: mode === "hand" ? 2 : 0,
+        MIDDLE: 1,
+        RIGHT: 2,
+      }}
+    />
+  );
+};

@@ -9,8 +9,12 @@ import { useGLTF } from "@react-three/drei";
 import useColorsStore from "@/store/useColorsStore";
 import * as THREE from "three";
 import useImageStore from "@/store/useImageStore";
+import useHistoryStore from "@/store/useHistoryStore";
+
 export default function Model({ textures }) {
   const { nodes, materials } = useGLTF("/models/newshirt.glb");
+
+  const { state } = useHistoryStore();
 
   const {
     garmentColor,
@@ -19,7 +23,8 @@ export default function Model({ textures }) {
     collarColor,
     leftShoulderColor,
     rightShoulderColor,
-  } = useColorsStore();
+  } = state;
+
   let frontMaterial = nodes.Front.material.clone();
   const backMaterial = nodes.Back.material.clone();
   const collarMaterial = nodes.Collar.material.clone();

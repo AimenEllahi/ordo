@@ -14,6 +14,7 @@ import {
 } from "fabric";
 import useImageStore from "@/store/useImageStore";
 import { twMerge } from "tailwind-merge";
+import useHistoryStore from "@/store/useHistoryStore";
 
 const UploadCard = ({ isActive }) => {
   const fileInputRef = useRef(null);

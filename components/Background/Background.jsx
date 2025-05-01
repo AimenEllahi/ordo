@@ -4,14 +4,11 @@ import OptionsWrapper from "../ui/OptionsWrapper";
 import Title from "../ui/title";
 import CustomButton from "../ui/CustomButton";
 import useBackgroundStore from "@/store/useBackgroundStore";
+import useHistoryStore from "@/store/useHistoryStore";
 
 const Background = () => {
-  const {
-    setBackgroundColor,
-    setBackgroundImage,
-    setBackgroundType,
-    backgroundType,
-  } = useBackgroundStore();
+  const { state, setState } = useHistoryStore();
+  const { backgroundType } = state;
   const fileInputRef = useRef(null);
   const colorInputRef = useRef(null);
 
@@ -19,7 +16,7 @@ const Background = () => {
   const [image, setImage] = useState(null);
 
   const handleBackgroundTypeChange = (type) => {
-    setBackgroundType(type);
+    setState({ backgroundType: type });
     if (type === "color") {
       setImage(null);
     } else {
@@ -28,17 +25,17 @@ const Background = () => {
   };
 
   const handleColorChange = (e) => {
-    setColor(e.target.value);
-    setBackgroundColor(e.target.value);
+    const selectedColor = e.target.value;
+    setColor(selectedColor);
+    setState({ backgroundColor: selectedColor });
   };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    console.log(file);
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
-      setBackgroundImage(imageUrl);
+      setState({ backgroundImage: imageUrl });
     }
   };
 

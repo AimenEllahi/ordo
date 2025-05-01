@@ -4,6 +4,7 @@ import Title from "../ui/title";
 import useColorsStore from "@/store/useColorsStore";
 import { useRef } from "react";
 import CustomButton from "../ui/CustomButton";
+import useHistoryStore from "@/store/useHistoryStore";
 
 const ColorOption = ({ setColorFunction, logColor, selectedColor }) => {
   const colorInputRef = useRef(null);
@@ -60,6 +61,7 @@ const ColorCategory = ({
 };
 
 const ColorPicker = () => {
+  const { state, setState } = useHistoryStore();
   const {
     garmentColor,
     frontColor,
@@ -67,18 +69,22 @@ const ColorPicker = () => {
     collarColor,
     leftShoulderColor,
     rightShoulderColor,
-    resetColors,
-    setGarmentColor,
-    setFrontColor,
-    setBackColor,
-    setCollarColor,
-    setLeftShoulderColor,
-    setRightShoulderColor,
-  } = useColorsStore();
+  } = state;
 
   // Log function
   const logColor = (color) => {
     console.log(`Selected color: ${color}`);
+  };
+
+  const resetColors = () => {
+    setState({
+      garmentColor: "#FFFFFF",
+      frontColor: "#FFFFFF",
+      backColor: "#FFFFFF",
+      collarColor: "#FFFFFF",
+      leftShoulderColor: "#FFFFFF",
+      rightShoulderColor: "#FFFFFF",
+    });
   };
 
   return (
@@ -88,12 +94,14 @@ const ColorPicker = () => {
         <ColorCategory
           category="Garment"
           setColorFunction={(color) => {
-            setFrontColor(color);
-            setBackColor(color);
-            setCollarColor(color);
-            setLeftShoulderColor(color);
-            setRightShoulderColor(color);
-            setGarmentColor(color);
+            setState({
+              garmentColor: color,
+              frontColor: color,
+              backColor: color,
+              collarColor: color,
+              leftShoulderColor: color,
+              rightShoulderColor: color,
+            });
           }}
           logColor={logColor}
           selectedColor={garmentColor}
@@ -101,32 +109,32 @@ const ColorPicker = () => {
         <div className="flex flex-row justify-between  w-full gap-1">
           <ColorCategory
             category="Front"
-            setColorFunction={setFrontColor}
+            setColorFunction={(color) => setState({ frontColor: color })}
             logColor={logColor}
             selectedColor={frontColor}
           />
           <ColorCategory
             category="Back"
-            setColorFunction={setBackColor}
+            setColorFunction={(color) => setState({ backColor: color })}
             logColor={logColor}
             selectedColor={backColor}
           />
           <ColorCategory
             category="Collar"
-            setColorFunction={setCollarColor}
+            setColorFunction={(color) => setState({ collarColor: color })}
             logColor={logColor}
             selectedColor={collarColor}
           />
           <ColorCategory
             category="Left shoulder"
-            setColorFunction={setLeftShoulderColor}
+            setColorFunction={(color) => setState({ leftShoulderColor: color })}
             logColor={logColor}
             selectedColor={leftShoulderColor}
           />
         </div>
         <ColorCategory
           category="Right shoulder"
-          setColorFunction={setRightShoulderColor}
+          setColorFunction={(color) => setState({ rightShoulderColor: color })}
           logColor={logColor}
           selectedColor={rightShoulderColor}
         />

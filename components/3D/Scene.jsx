@@ -1,18 +1,20 @@
 "use client";
 import React, { useEffect, useState, Suspense, useRef } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, OrbitControls, Stage } from "@react-three/drei";
 import { RepeatWrapping, CanvasTexture } from "three";
 import NewShirt from "./NewShirt";
 import useImageStore from "@/store/useImageStore";
 import Loader from "./Loader";
-import useBackgroundStore from "@/store/useBackgroundStore";
-import CustomButton from "../ui/CustomButton";
+import { DragControls } from "@react-three/drei";
+import { ArcballControls } from "@react-three/drei";
 import ExportModel from "../ExportModel/ExportModel";
-import ExportIcon from "../ui/icons/Export";
+
 import html2canvas from "html2canvas-pro";
 import { useThree } from "@react-three/fiber";
 import useHistoryStore from "@/store/useHistoryStore";
+
+import * as THREE from "three";
 
 const RotateModel = ({ modelRef }) => {
   const { state } = useHistoryStore();
@@ -33,8 +35,10 @@ const RotateModel = ({ modelRef }) => {
 };
 
 export default function Scene() {
-  const { textureUrl } = useImageStore();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { textureUrl, isExportModalOpen, setIsExportModalOpen } =
+    useImageStore();
+  const groupRef = useRef();
+
   const [textures, setTextures] = useState({});
   const [modelLoaded, setModelLoaded] = useState(false);
   const canvasWrapperRef = useRef(null);
@@ -95,7 +99,7 @@ export default function Scene() {
 
   // 🟡 takeSS with type-based target
   const takeSS = async (type = "jpeg") => {
-    const selector = type === "png" ? "#cc2" : "#canvas-container";
+    const selector = type === "png" ? "#canvas-only" : "#canvas-container";
     const target = document.querySelector(selector);
     if (!target) return null;
 
@@ -154,7 +158,10 @@ export default function Scene() {
 
   const recordVideoFromCanvas = (format) => {
     requestAnimationFrame(() => {
-      const canvas = document.querySelector("#canvas-container canvas");
+      const canvas =
+        format === "MP4"
+          ? document.querySelector("#canvas-container canvas")
+          : document.querySelector("#canvas-only");
 
       if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
         console.error("Canvas element not found or invalid.");
@@ -221,42 +228,35 @@ export default function Scene() {
           backgroundSize: "cover",
         }}
       >
-        <Canvas id="cc2" gl={{ preserveDrawingBuffer: true }}>
-          <RotateModel modelRef={modelRef} />
-          <directionalLight
-            position={[10, 10, 5]}
-            intensity={1}
-            color={"#ffffff"}
-            castShadow
-          />
-          <Environment files={"/env/lebombo_1k.hdr"} />
-          <Stage shadows={false} adjustCamera={1.1}>
-            <OrbitControlsWrapper mode={activeMode} />
+        <div className="h-full w-full">
+          <Canvas id="canvas-only" gl={{ preserveDrawingBuffer: true }}>
+            <RotateModel modelRef={modelRef} />
+            <directionalLight
+              position={[10, 10, 5]}
+              intensity={1}
+              color={"#ffffff"}
+              castShadow
+            />
+            <Environment files={"/env/lebombo_1k.hdr"} />
+            <CustomControls modelRef={modelRef} mode={activeMode} />
 
+            {/* <OrbitControlsWrapper modelRef={modelRef} mode={activeMode} /> */}
             <Suspense fallback={<Loader />}>
-              <group ref={modelRef}>
-                <NewShirt textures={textures} />
+              <group position-z={4}>
+                <group ref={modelRef}>
+                  <NewShirt textures={textures} />
+                </group>
               </group>
             </Suspense>
-          </Stage>
-        </Canvas>
+          </Canvas>
+        </div>
       </div>
 
-      {/* Export Button */}
-      <CustomButton
-        onClick={() => setIsModalOpen(true)}
-        text="Export"
-        icon={<ExportIcon />}
-        className="absolute bottom-[20%] mt-4 left-6 flex justify-center items-center"
-        variant={2}
-        disabled={!modelLoaded}
-      />
-
       {/* Export Modal */}
-      {isModalOpen && (
+      {isExportModalOpen && (
         <ExportModel
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
           formatHandlers={{
             JPEG: handleJPEGDownload,
             PNG: handlePNGDownload,
@@ -269,26 +269,55 @@ export default function Scene() {
   );
 }
 
-const OrbitControlsWrapper = ({ mode }) => {
-  const { camera, gl } = useThree();
+const CustomControls = ({ modelRef, mode }) => {
+  const isDragging = useRef(false);
+  const lastMouse = useRef({ x: 0, y: 0 });
+
+  const { size, camera } = useThree();
 
   useEffect(() => {
-    camera.position.set(0, 0, 5);
-  }, [camera]);
+    const onMouseDown = (e) => {
+      isDragging.current = true;
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+    };
 
-  return (
-    <OrbitControls
-      args={[camera, gl.domElement]}
-      enableRotate={mode === "cursor"}
-      enablePan={mode === "hand"}
-      enableZoom={false}
-      panSpeed={1.2}
-      screenSpacePanning={true}
-      mouseButtons={{
-        LEFT: mode === "hand" ? 2 : 0,
-        MIDDLE: 1,
-        RIGHT: 2,
-      }}
-    />
-  );
+    const onMouseMove = (e) => {
+      if (!isDragging.current || !modelRef.current) return;
+
+      const deltaX = e.clientX - lastMouse.current.x;
+      const deltaY = e.clientY - lastMouse.current.y;
+
+      if (mode === "cursor") {
+        // Rotate
+        const rotSpeed = 0.005;
+        modelRef.current.rotation.y += deltaX * rotSpeed;
+        modelRef.current.rotation.x += deltaY * rotSpeed;
+      }
+
+      if (mode === "hand") {
+        // Drag
+        const dragSpeed = 0.005;
+        modelRef.current.position.x += deltaX * dragSpeed;
+        modelRef.current.position.y -= deltaY * dragSpeed;
+      }
+
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const onMouseUp = () => {
+      isDragging.current = false;
+    };
+
+    window.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+
+    return () => {
+      window.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [mode]);
+
+  return null;
 };

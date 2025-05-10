@@ -13,18 +13,7 @@ import useHistoryStore from "@/store/useHistoryStore";
 
 export default function Model({ textures }) {
   const { nodes, materials } = useGLTF("/models/newshirt.glb");
-
-  const { state } = useHistoryStore();
-
-  const {
-    garmentColor,
-    frontColor,
-    backColor,
-    collarColor,
-    leftShoulderColor,
-    rightShoulderColor,
-  } = state;
-
+  const { garmentColor } = useHistoryStore().state;
   let frontMaterial = nodes.Front.material.clone();
   const backMaterial = nodes.Back.material.clone();
   const collarMaterial = nodes.Collar.material.clone();
@@ -51,9 +40,7 @@ export default function Model({ textures }) {
         materials[key].needsUpdate = true; // Ensure the material updates to reflect the new texture
       }
     });
-
-    console.log("🖼️ Textures applied to corresponding materials");
-  }, [textures, frontColor, backColor, leftShoulderColor, rightShoulderColor]); // Watch for changes in textures
+  }, [textures]);
 
   return (
     <group dispose={null}>
@@ -62,7 +49,6 @@ export default function Model({ textures }) {
         receiveShadow
         geometry={nodes.Collar.geometry}
         material={collarMaterial}
-        material-color={collarColor}
       />
       <mesh
         castShadow
@@ -136,28 +122,24 @@ export default function Model({ textures }) {
         receiveShadow
         geometry={nodes.Front.geometry}
         material={frontMaterial}
-        material-color={frontColor}
       />
       <mesh
         castShadow
         receiveShadow
         geometry={nodes.Right.geometry}
         material={rightShoulderMaterial}
-        material-color={rightShoulderColor}
       />
       <mesh
         castShadow
         receiveShadow
         geometry={nodes.Left.geometry}
         material={leftShoulderMaterial}
-        material-color={leftShoulderColor}
       />
       <mesh
         castShadow
         receiveShadow
         geometry={nodes.Back.geometry}
         material={backMaterial}
-        material-color={backColor}
       />
     </group>
   );

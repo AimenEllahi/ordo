@@ -1,22 +1,24 @@
 import { useState } from "react";
-import UploadIcon from "../ui/icons/Upload";
-import ModelIcon from "../ui/icons/Model";
-import ColorIcon from "../ui/icons/Color";
-import BackgroundIcon from "../ui/icons/Background";
-import CameraIcon from "../ui/icons/Camera";
-import RatioIcon from "../ui/icons/Ratio";
-import AnimatorIcon from "../ui/icons/Animator";
+import UploadIcon from "@/components/ui/icons/Upload";
+import ModelIcon from "@/components/ui/icons/Model";
+import ColorIcon from "@/components/ui/icons/Color";
+import BackgroundIcon from "@/components/ui/icons/Background";
+import CameraIcon from "@/components/ui/icons/Camera";
+import RatioIcon from "@/components/ui/icons/Ratio";
+import AnimatorIcon from "@/components/ui/icons/Animator";
 
-import UploadCard from "../Upload/UploadCard";
-import ModelShirt from "../ModelShirt/Model";
-import ColorPicker from "../ColorPicker/ColorPicker";
-import Background from "../Background/Background";
-import ModelAnimation from "../ModelAnimation/ModelAnimation";
-import CameraAnimationSelector from "../CameraAnimator/CameraAnimator";
-import SceneRatio from "../SceneRatio/Sceneratio";
+import UploadCard from "@/components/Upload/UploadCard";
+import ModelShirt from "@/components/ModelShirt/Model";
+import ColorPicker from "@/components/ColorPicker/ColorPicker";
+import Background from "@/components/Background/Background";
+import ModelAnimation from "@/components/ModelAnimation/ModelAnimation";
+import CameraAnimationSelector from "@/components/CameraAnimator/CameraAnimator";
+import SceneRatio from "@/components/SceneRatio/Sceneratio";
+import ExportIcon from "@/components/ui/icons/Export";
 import { cn } from "@/lib/utils";
 
 import useImageStore from "@/store/useImageStore";
+import CustomButton from "../ui/CustomButton";
 
 const SidebarBtn = ({ children, onClick }) => {
   return (
@@ -31,7 +33,7 @@ const SidebarBtn = ({ children, onClick }) => {
 const Sidebar = () => {
   const [activeTab, setActiveTab] = useState(null);
 
-  const { textureUrl } = useImageStore();
+  const { textureUrl, setIsExportModalOpen } = useImageStore();
   const toggleTab = (tab) => {
     setActiveTab((prevTab) => (prevTab === tab ? null : tab));
   };
@@ -134,6 +136,13 @@ const Sidebar = () => {
             {activeTab === "ratio" && <SceneRatio />}
           </div>
         </div>
+        <CustomButton
+          onClick={() => setIsExportModalOpen(true)}
+          text="Export"
+          icon={<ExportIcon />}
+          className=" w-full mt-4 flex justify-center items-center"
+          variant={2}
+        />
 
         {/* <div className='fixed bottom-0 items-center left-0 w-screen justify-center flex gap-4'>
           {Object.keys(textureUrl)

@@ -73,7 +73,7 @@ const ColorPicker = () => {
 
   // Log function
   const logColor = (color) => {
-    console.log(`Selected color: ${color}`);
+    //   console.log(`Selected color: ${color}`);
   };
 
   const resetColors = () => {
@@ -103,7 +103,7 @@ const ColorPicker = () => {
               rightShoulderColor: color,
             });
           }}
-          logColor={logColor}
+          // logColor={logColor}
           selectedColor={garmentColor}
         />
         <div className="flex flex-row justify-between  w-full gap-1">

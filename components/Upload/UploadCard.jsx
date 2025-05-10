@@ -25,6 +25,9 @@ const UploadCard = ({ isActive }) => {
 
   const { setTextureUrl, addImage, removeImage } = useImageStore();
 
+  const state = useHistoryStore().getState();
+  const _useHistoryStore = useHistoryStore();
+
   useEffect(() => {
     async function loadDependencies() {
       if (!heic2anyRef.current) {
@@ -230,10 +233,19 @@ const UploadCard = ({ isActive }) => {
       generateTexture();
     });
 
+    canvas.on("mouse:up", () => {
+      generateTexture();
+    });
+
     //drawAreaBorders();
 
     return () => canvas.dispose();
   }, []);
+
+  useEffect(() => {
+    generateTexture();
+  }, [state]);
+
   const generateTexture = () => {
     if (!fabricCanvas.current || !areaRef.current) return;
 
@@ -247,21 +259,23 @@ const UploadCard = ({ isActive }) => {
       const ctx = textureCanvas.getContext("2d");
 
       // Fill the canvas with white before drawing the image to handle transparency.
-      ctx.fillStyle = "white";
+      ctx.fillStyle =
+        areaKey === "front"
+          ? _useHistoryStore.getState().frontColor
+          : areaKey === "back"
+          ? _useHistoryStore.getState().backColor
+          : areaKey === "leftSleeve"
+          ? _useHistoryStore.getState().leftShoulderColor
+          : areaKey === "rightSleeve"
+          ? _useHistoryStore.getState().rightShoulderColor
+          : areaKey === "collar"
+          ? _useHistoryStore.getState().collarColor
+          : "#FFFFFF";
+
       ctx.fillRect(0, 0, textureCanvas.width, textureCanvas.height);
 
       ctx.translate(0, textureCanvas.height);
       ctx.scale(1, -1);
-      if (areaKey === "front") {
-        console.log(
-          "🖼️ Fabric canvas size:",
-          fabricCanvas.current.width,
-          fabricCanvas.current.height,
-          textureCanvas.width,
-          textureCanvas.height
-        );
-        console.log("🖼️ Area:", area);
-      }
 
       ctx.drawImage(
         fabricCanvas.current.lowerCanvasEl,

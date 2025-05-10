@@ -43,12 +43,15 @@ const ExportModel = ({ isOpen, onClose, formatHandlers }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all z-50">
       <div className="bg-white border border-[#D4D4D4] rounded-[20px] p-[50px] w-1/2 shadow-lg text-center relative">
-        <button onClick={onClose} className="absolute top-6 right-6">
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 cursor-pointer"
+        >
           <Cross className="w-7 h-7" />
         </button>
         <div className="flex flex-col gap-11">
           <div className="flex flex-col gap-4 items-center">
-            <h2 className="text-[31px] font-bold font-helvetica-button">
+            <h2 className="text-[31px] font-bold anton-sc-regular ">
               EXPORT YOUR RESULT
             </h2>
             <p className="text-[12px] font-light text-[#818181] text-center">

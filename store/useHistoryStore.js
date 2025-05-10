@@ -33,6 +33,7 @@ const useHistoryStore = create((set, get) => ({
       state: newState,
     }));
   },
+  getState: () => get().state,
 
   undo: () => {
     const { history, state, future } = get();

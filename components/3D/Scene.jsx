@@ -6,15 +6,11 @@ import { RepeatWrapping, CanvasTexture } from "three";
 import NewShirt from "./NewShirt";
 import useImageStore from "@/store/useImageStore";
 import Loader from "./Loader";
-import { DragControls } from "@react-three/drei";
-import { ArcballControls } from "@react-three/drei";
 import ExportModel from "../ExportModel/ExportModel";
 
 import html2canvas from "html2canvas-pro";
 import { useThree } from "@react-three/fiber";
 import useHistoryStore from "@/store/useHistoryStore";
-
-import * as THREE from "three";
 
 const RotateModel = ({ modelRef }) => {
   const { state } = useHistoryStore();

@@ -7,7 +7,7 @@ import { useGLTF } from "@react-three/drei";
 import useHistoryStore from "@/store/useHistoryStore";
 
 export default function Model({ textures }) {
-  const { nodes, materials } = useGLTF("/models/shirt-2.glb");
+  const { nodes, materials } = useGLTF("/shirt.glb");
   const { garmentColor } = useHistoryStore().state;
   let frontMaterial = nodes.Front.material.clone();
   const backMaterial = nodes.Back.material.clone();
@@ -140,4 +140,4 @@ export default function Model({ textures }) {
   );
 }
 
-useGLTF.preload("/models/shirt-2.glb");
+useGLTF.preload("/shirt.glb");

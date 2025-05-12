@@ -8,7 +8,7 @@ import useHistoryStore from "@/store/useHistoryStore";
 
 export default function Model({ textures }) {
   const { nodes, materials } = useGLTF("/shirt.glb");
-  const { garmentColor } = useHistoryStore().state;
+  const { garmentColor, collarColor } = useHistoryStore().state;
   let frontMaterial = nodes.Front.material.clone();
   const backMaterial = nodes.Back.material.clone();
   const collarMaterial = nodes.Collar.material.clone();
@@ -44,6 +44,7 @@ export default function Model({ textures }) {
         receiveShadow
         geometry={nodes.Collar.geometry}
         material={collarMaterial}
+        material-color={collarColor}
       />
       <mesh
         castShadow

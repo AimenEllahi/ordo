@@ -121,21 +121,6 @@ export default function Scene() {
   const handlePNGDownload = async () => {
     console.log("Downloading PNG with transparent background...");
 
-    const wrapper = document.querySelector("#canvas-container");
-    const canvas = wrapper?.querySelector("canvas");
-
-    if (!wrapper || !canvas) return;
-
-    // Save current background styles
-    const prevWrapperBg = wrapper.style.background;
-    const prevCanvasBgColor = canvas.style.backgroundColor;
-    const prevCanvasBgImage = canvas.style.backgroundImage;
-
-    // Remove all background styles
-    wrapper.style.background = "none";
-    canvas.style.backgroundColor = "transparent";
-    canvas.style.backgroundImage = "none";
-
     setTimeout(async () => {
       const imgData = await takeSS("png");
       if (!imgData) return;
@@ -144,11 +129,6 @@ export default function Scene() {
       link.href = imgData;
       link.download = "model-transparent.png";
       link.click();
-
-      // Restore previous styles
-      wrapper.style.background = prevWrapperBg;
-      canvas.style.backgroundColor = prevCanvasBgColor;
-      canvas.style.backgroundImage = prevCanvasBgImage;
     }, 100);
   };
 
@@ -202,7 +182,7 @@ export default function Scene() {
 
   return (
     <div
-      className="relative flex justify-center z-1 w-full h-screen "
+      className="relative flex justify-center z-1 w-screen h-screen "
       style={{
         backgroundImage:
           backgroundRatio !== "16:9" ? `url(/checkered-bg.png)` : null,
@@ -222,6 +202,7 @@ export default function Scene() {
           backgroundImage:
             backgroundType === "image" ? `url(${backgroundImage})` : "none",
           backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       >
         <div className="h-full w-full">

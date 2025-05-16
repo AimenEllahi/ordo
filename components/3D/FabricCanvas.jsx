@@ -5,12 +5,13 @@ import {
   FabricText,
   FabricImage,
 } from "fabric";
-import useImageStore from "@/store/useImageStore";
+import useHistoryStore from "@/store/useHistoryStore";
 
 export default function FabricCanvas({ onUpdate }) {
   const canvasRef = useRef(null);
   const fabricCanvas = useRef(null);
-  const { uploadedImage } = useImageStore();
+  const { uploadedImages } = useHistoryStore();
+  const uploadedImage = uploadedImages[0];
 
   useEffect(() => {
     if (typeof window === "undefined" || !canvasRef.current) return;

@@ -33,6 +33,9 @@ const RotateModel = ({ modelRef }) => {
 
 export default function Scene() {
   const { textureUrl } = useImageStore();
+  const [isRecording, setIsRecording] = useState(false);
+  const recorderRef = useRef(null); // to hold MediaRecorder instance
+
   const { isExportModalOpen, setIsExportModalOpen } = useExportStore();
   const groupRef = useRef();
 
@@ -156,6 +159,9 @@ export default function Scene() {
         mimeType: "video/webm;codecs=vp9",
       });
 
+      recorderRef.current = recorder;
+      setIsRecording(true);
+
       recorder.ondataavailable = (e) => chunks.push(e.data);
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: "video/webm" });
@@ -164,10 +170,13 @@ export default function Scene() {
         a.href = url;
         a.download = `export-video.${format.toLowerCase()}`;
         a.click();
+
+        // Reset
+        recorderRef.current = null;
+        setIsRecording(false);
       };
 
       recorder.start();
-      setTimeout(() => recorder.stop(), 5000);
     });
   };
 
@@ -183,6 +192,26 @@ export default function Scene() {
 
   return (
     <>
+      {isRecording && (
+        <div className="fixed bottom-4 left-4 z-50 bg-black text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-3">
+          <img src="/icons/Record.png" alt="Recording" className="w-5 h-5" />
+          <span className="text-sm font-semibold">
+            Recording in progress...
+          </span>
+          <button
+            className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1 rounded"
+            onClick={() => {
+              if (recorderRef.current) {
+                recorderRef.current.stop();
+                setIsRecording(false);
+              }
+            }}
+          >
+            Stop Recording
+          </button>
+        </div>
+      )}
+
       <div
         className="relative flex justify-center z-1 w-screen h-screen "
         style={{

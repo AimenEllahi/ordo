@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 import useImageStore from "@/store/useImageStore";
 import CustomButton from "../ui/CustomButton";
+import useExportStore from "@/store/useExportStore";
 
 const SidebarBtn = ({ children, onClick }) => {
   return (
@@ -33,7 +34,7 @@ const SidebarBtn = ({ children, onClick }) => {
 const Sidebar = () => {
   const [activeTab, setActiveTab] = useState(null);
 
-  const { textureUrl, setIsExportModalOpen } = useImageStore();
+  const { setIsExportModalOpen } = useExportStore();
   const toggleTab = (tab) => {
     setActiveTab((prevTab) => (prevTab === tab ? null : tab));
   };

@@ -11,10 +11,12 @@ import {
   FabricObject,
   util,
   Group,
+  Control,
 } from "fabric";
 import useImageStore from "@/store/useImageStore";
 import { twMerge } from "tailwind-merge";
 import useHistoryStore from "@/store/useHistoryStore";
+import useExportStore from "@/store/useExportStore";
 
 const UploadCard = ({ isActive }) => {
   const fileInputRef = useRef(null);
@@ -24,7 +26,7 @@ const UploadCard = ({ isActive }) => {
   const heic2anyRef = useRef(null);
 
   const { setTextureUrl, addImage, removeImage } = useImageStore();
-
+  const { isExportModalOpen } = useExportStore();
   const state = useHistoryStore().getState();
   const _useHistoryStore = useHistoryStore();
 
@@ -100,8 +102,6 @@ const UploadCard = ({ isActive }) => {
     FabricImage.fromURL(image).then((img) => {
       const area = areaRef.current?.front; // Example: Assigning images to the 'front' area
 
-      img.scaleToWidth(area?.width || img.width);
-      img.scaleToHeight(area?.height || img.height);
       img.set({
         left: area?.x,
         top: area?.y,
@@ -111,21 +111,27 @@ const UploadCard = ({ isActive }) => {
       });
       img.toObject = () => ({ ...img.toObject(), id: url });
 
-      // Add custom delete control
-      // img.controls.deleteControl = new Control({
-      //   x: 0.5,
-      //   y: -0.5,
-      //   offsetY: 0,
-      //   offsetX: -img.getScaledWidth() / 2 - 30,
-      //   cursorStyle: "pointer",
-      //   actionHandler: (eventData, transformer, x, y) => {
-      //     const target = transformer.target;
-      //     const canvas = target.canvas;
-      //     canvas.remove(target);
-      //     canvas.requestRenderAll();
-      //   },
-      //   render: renderDeleteIcon,
-      // });
+      //Add custom delete control
+      img.controls.deleteControl = new Control({
+        x: 0.95,
+        y: -0.7,
+        offsetY: 0,
+        offsetX: -img.getScaledWidth() / 2,
+
+        cursorStyle: "pointer",
+        // mouseDownHandler: (eventData, transform) => {
+        //   console.log("Delete icon clicked 2");
+        // },
+
+        actionHandler: (eventData, transformer, x, y) => {
+          console.log("Delete icon clicked");
+          const target = transformer.target;
+          const canvas = target.canvas;
+          canvas.remove(target);
+          canvas.requestRenderAll();
+        },
+        render: renderDeleteIcon,
+      });
 
       fabricCanvas.current.add(img);
       fabricCanvas.current.renderAll();
@@ -133,10 +139,18 @@ const UploadCard = ({ isActive }) => {
     });
   };
   function renderDeleteIcon(ctx, left, top, styleOverride, fabricObject) {
-    const size = 100; // Increase the size of the icon
+    const sizeX = 75; // Increase the size of the icon
+    const sizeY = 100; // Increase the size of the icon
 
-    ctx.fillRect(left, top, size, size); // Draw the icon background
-    ctx.drawImage(document.getElementById("deleteIcon"), left, top, size, size);
+    ctx.fillRect(left, top, sizeX, sizeY); // Draw the icon background
+
+    ctx.drawImage(
+      document.getElementById("deleteIcon"),
+      left,
+      top,
+      sizeX,
+      sizeY
+    );
   }
   const deleteImage = (url) => {
     const object = fabricCanvas.current
@@ -245,10 +259,15 @@ const UploadCard = ({ isActive }) => {
   useEffect(() => {
     generateTexture();
   }, [state]);
+  useEffect(() => {
+    setTimeout(() => {
+      generateTexture();
+    }, 100);
+  }, [isExportModalOpen]);
 
   const generateTexture = () => {
     if (!fabricCanvas.current || !areaRef.current) return;
-
+    console.log("Generating texture...");
     Object.keys(areaRef.current).forEach((areaKey) => {
       const area = areaRef.current[areaKey];
       const textureCanvas = document.createElement("canvas");
@@ -299,7 +318,7 @@ const UploadCard = ({ isActive }) => {
     <OptionsWrapper
       className={!isActive && "opacity-0 pointer-events-none absolute"}
     >
-      <div className={twMerge("w-[310px] h-[400px] overflow-hidden")}>
+      <div className={twMerge("w-[372px] h-[460px] overflow-hidden")}>
         <Title>Upload Image/SVG</Title>
         <p className="font-medium text-md mt-1 text-gray-400">
           Upload an image and move it on the template below to display on the
@@ -325,19 +344,19 @@ const UploadCard = ({ isActive }) => {
 
         <div
           className={twMerge(
-            "mt-10     max-h-[230px] max-w-[310px] relative rounded-lg"
+            "mt-10   max-h-[300px] max-w-[372px] relative rounded-lg"
           )}
         >
           {" "}
           <img
             src="uploadposition.png"
             alt="Template"
-            className="w-full pointer-events-none absolute max-h-[230px] -top-10 left-0"
+            className="w-full pointer-events-none absolute max-h-[300px] -top-10 left-0"
           />
           <canvas
             ref={canvasRef}
             id="canvas"
-            className=" max-h-[230px] max-w-[310px]  "
+            className=" max-h-[300px] max-w-[372px]  "
           ></canvas>
           <img
             id="deleteIcon"

@@ -41,7 +41,7 @@ const ExportModel = ({ isOpen, onClose, formatHandlers }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all z-[200]">
       <div className="bg-white border border-[#D4D4D4] rounded-[20px] p-[50px] w-1/2 shadow-lg text-center relative">
         <button
           onClick={onClose}

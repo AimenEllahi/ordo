@@ -17,7 +17,7 @@ const ColorOption = ({ setColorFunction, logColor, selectedColor }) => {
   const handleColorChange = (event) => {
     const newColor = event.target.value;
     setColorFunction(newColor);
-    logColor(newColor); // Log the selected color
+    //logColor(newColor); // Log the selected color
   };
 
   return (

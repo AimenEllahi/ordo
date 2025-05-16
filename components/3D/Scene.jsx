@@ -9,8 +9,9 @@ import Loader from "./Loader";
 import ExportModel from "../ExportModel/ExportModel";
 
 import html2canvas from "html2canvas-pro";
-import { useThree } from "@react-three/fiber";
+import CustomControls from "./CustomControls";
 import useHistoryStore from "@/store/useHistoryStore";
+import useExportStore from "@/store/useExportStore";
 
 const RotateModel = ({ modelRef }) => {
   const { state } = useHistoryStore();
@@ -31,8 +32,8 @@ const RotateModel = ({ modelRef }) => {
 };
 
 export default function Scene() {
-  const { textureUrl, isExportModalOpen, setIsExportModalOpen } =
-    useImageStore();
+  const { textureUrl } = useImageStore();
+  const { isExportModalOpen, setIsExportModalOpen } = useExportStore();
   const groupRef = useRef();
 
   const [textures, setTextures] = useState({});
@@ -181,54 +182,55 @@ export default function Scene() {
   };
 
   return (
-    <div
-      className="relative flex justify-center z-1 w-screen h-screen "
-      style={{
-        backgroundImage:
-          backgroundRatio !== "16:9" ? `url(/checkered-bg.png)` : null,
-        backgroundSize: "cover",
-        cursor: activeMode === "hand" ? "grab" : "default",
-      }}
-    >
+    <>
       <div
-        className="transition-all duration-300 ease-in-out"
-        ref={canvasWrapperRef}
-        id="canvas-container"
+        className="relative flex justify-center z-1 w-screen h-screen "
         style={{
-          width: getCanvasWidth(),
-          height: "100%",
-          backgroundColor:
-            backgroundType === "color" ? backgroundColor : "transparent",
           backgroundImage:
-            backgroundType === "image" ? `url(${backgroundImage})` : "none",
+            backgroundRatio !== "16:9" ? `url(/checkered-bg.png)` : null,
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          cursor: activeMode === "hand" ? "grab" : "default",
         }}
       >
-        <div className="h-full w-full">
-          <Canvas id="canvas-only" gl={{ preserveDrawingBuffer: true }}>
-            <RotateModel modelRef={modelRef} />
-            <directionalLight
-              position={[10, 10, 5]}
-              intensity={1}
-              color={"#ffffff"}
-              castShadow
-            />
-            <Environment files={"/env/lebombo_1k.hdr"} />
-            <CustomControls modelRef={modelRef} mode={activeMode} />
+        <div
+          className="transition-all duration-300 ease-in-out"
+          ref={canvasWrapperRef}
+          id="canvas-container"
+          style={{
+            width: getCanvasWidth(),
+            height: "100%",
+            backgroundColor:
+              backgroundType === "color" ? backgroundColor : "transparent",
+            backgroundImage:
+              backgroundType === "image" ? `url(${backgroundImage})` : "none",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="h-full w-full">
+            <Canvas id="canvas-only" gl={{ preserveDrawingBuffer: true }}>
+              <RotateModel modelRef={modelRef} />
+              <directionalLight
+                position={[10, 10, 5]}
+                intensity={1}
+                color={"#ffffff"}
+                castShadow
+              />
+              <Environment files={"/env/lebombo_1k.hdr"} />
+              <CustomControls modelRef={modelRef} mode={activeMode} />
 
-            {/* <OrbitControlsWrapper modelRef={modelRef} mode={activeMode} /> */}
-            <Suspense fallback={<Loader />}>
-              <group position-z={4}>
-                <group ref={modelRef}>
-                  <NewShirt textures={textures} />
+              {/* <OrbitControlsWrapper modelRef={modelRef} mode={activeMode} /> */}
+              <Suspense fallback={<Loader />}>
+                <group position-z={4}>
+                  <group ref={modelRef}>
+                    <NewShirt textures={textures} />
+                  </group>
                 </group>
-              </group>
-            </Suspense>
-          </Canvas>
+              </Suspense>
+            </Canvas>
+          </div>
         </div>
       </div>
-
       {/* Export Modal */}
       {isExportModalOpen && (
         <ExportModel
@@ -242,59 +244,6 @@ export default function Scene() {
           }}
         />
       )}
-    </div>
+    </>
   );
 }
-
-const CustomControls = ({ modelRef, mode }) => {
-  const isDragging = useRef(false);
-  const lastMouse = useRef({ x: 0, y: 0 });
-
-  const { size, camera } = useThree();
-
-  useEffect(() => {
-    const onMouseDown = (e) => {
-      isDragging.current = true;
-      lastMouse.current = { x: e.clientX, y: e.clientY };
-    };
-
-    const onMouseMove = (e) => {
-      if (!isDragging.current || !modelRef.current) return;
-
-      const deltaX = e.clientX - lastMouse.current.x;
-      const deltaY = e.clientY - lastMouse.current.y;
-
-      if (mode === "cursor") {
-        // Rotate
-        const rotSpeed = 0.005;
-        modelRef.current.rotation.y += deltaX * rotSpeed;
-        modelRef.current.rotation.x += deltaY * rotSpeed;
-      }
-
-      if (mode === "hand") {
-        // Drag
-        const dragSpeed = 0.005;
-        modelRef.current.position.x += deltaX * dragSpeed;
-        modelRef.current.position.y -= deltaY * dragSpeed;
-      }
-
-      lastMouse.current = { x: e.clientX, y: e.clientY };
-    };
-
-    const onMouseUp = () => {
-      isDragging.current = false;
-    };
-
-    window.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-
-    return () => {
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-  }, [mode]);
-
-  return null;
-};

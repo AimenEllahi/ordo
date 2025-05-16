@@ -2,9 +2,7 @@ import { create } from "zustand";
 
 const useImageStore = create((set) => ({
   uploadedImages: [],
-  isExportModalOpen: false,
-  setIsExportModalOpen: (isOpen) => set({ isExportModalOpen: isOpen }),
-
+ 
   addImage: (image) =>
     set((state) => ({ uploadedImages: [...state.uploadedImages, image] })),
   removeImage: (url) =>

@@ -8,7 +8,14 @@ import useHistoryStore from "@/store/useHistoryStore";
 
 export default function Model({ textures }) {
   const { nodes, materials } = useGLTF("/shirt.glb");
-  const { garmentColor, collarColor } = useHistoryStore().state;
+  const {
+    garmentColor,
+    backColor,
+    collarColor,
+    frontColor,
+    leftShoulderColor,
+    rightShoulderColor,
+  } = useHistoryStore().state;
   let frontMaterial = nodes.Front.material.clone();
   const backMaterial = nodes.Back.material.clone();
   const collarMaterial = nodes.Collar.material.clone();
@@ -16,23 +23,45 @@ export default function Model({ textures }) {
   const rightShoulderMaterial = nodes.Right.material.clone();
   const innerMaterial = nodes.Inner.material.clone();
 
+  const applyUnblendedMap = (material, texture) => {
+    material.map = texture;
+    material.transparent = true;
+    material.alphaTest = 0.5;
+    // Force shader features to be included
+    material.defines = material.defines || {};
+    material.defines.USE_UV = "";
+    material.defines.USE_MAP = "";
+    material.onBeforeCompile = (shader) => {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <map_fragment>",
+        `
+  #ifdef USE_MAP
+    vec4 texelColor = texture2D(map, vUv);
+    diffuseColor.rgb = mix(diffuseColor.rgb, texelColor.rgb, texelColor.a);
+  #endif
+  `
+      );
+    };
+
+    material.needsUpdate = true;
+  };
+
   //   // Apply texture to all cloned materials
   useEffect(() => {
-    const materials = {
+    const matMap = {
       front: frontMaterial,
       back: backMaterial,
-      collar: collarMaterial,
+
       leftSleeve: leftShoulderMaterial,
       rightSleeve: rightShoulderMaterial,
     };
 
     Object.keys(textures).forEach((key) => {
-      if (textures[key] && materials[key]) {
-        textures[key].flipY = false; // Set the flipY property for each texture
-        textures[key].needsUpdate = true; // Update the texture
-
-        materials[key].map = textures[key]; // Assign the texture to the correct material
-        materials[key].needsUpdate = true; // Ensure the material updates to reflect the new texture
+      const texture = textures[key];
+      if (texture && matMap[key]) {
+        texture.flipY = false;
+        texture.needsUpdate = true;
+        applyUnblendedMap(matMap[key], texture);
       }
     });
   }, [textures]);
@@ -118,24 +147,28 @@ export default function Model({ textures }) {
         receiveShadow
         geometry={nodes.Front.geometry}
         material={frontMaterial}
+        material-color={frontColor}
       />
       <mesh
         castShadow
         receiveShadow
         geometry={nodes.Right.geometry}
         material={rightShoulderMaterial}
+        material-color={rightShoulderColor}
       />
       <mesh
         castShadow
         receiveShadow
         geometry={nodes.Left.geometry}
         material={leftShoulderMaterial}
+        material-color={leftShoulderColor}
       />
       <mesh
         castShadow
         receiveShadow
         geometry={nodes.Back.geometry}
         material={backMaterial}
+        material-color={backColor}
       />
     </group>
   );

@@ -17,6 +17,7 @@ import useImageStore from "@/store/useImageStore";
 import { twMerge } from "tailwind-merge";
 import useHistoryStore from "@/store/useHistoryStore";
 import useExportStore from "@/store/useExportStore";
+import { debounce } from "lodash";
 
 const UploadCard = ({ isActive }) => {
   const fileInputRef = useRef(null);
@@ -267,7 +268,7 @@ const UploadCard = ({ isActive }) => {
 
   const generateTexture = () => {
     if (!fabricCanvas.current || !areaRef.current) return;
-    console.log("Generating texture...");
+
     Object.keys(areaRef.current).forEach((areaKey) => {
       const area = areaRef.current[areaKey];
       const textureCanvas = document.createElement("canvas");
@@ -278,18 +279,7 @@ const UploadCard = ({ isActive }) => {
       const ctx = textureCanvas.getContext("2d");
 
       // Fill the canvas with white before drawing the image to handle transparency.
-      ctx.fillStyle =
-        areaKey === "front"
-          ? _useHistoryStore.getState().frontColor
-          : areaKey === "back"
-          ? _useHistoryStore.getState().backColor
-          : areaKey === "leftSleeve"
-          ? _useHistoryStore.getState().leftShoulderColor
-          : areaKey === "rightSleeve"
-          ? _useHistoryStore.getState().rightShoulderColor
-          : areaKey === "collar"
-          ? _useHistoryStore.getState().collarColor
-          : "#FFFFFF";
+      ctx.fillStyle = "transparent";
 
       ctx.fillRect(0, 0, textureCanvas.width, textureCanvas.height);
 

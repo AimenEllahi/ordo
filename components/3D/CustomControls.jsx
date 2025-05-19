@@ -1,11 +1,38 @@
 import { useEffect, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 
-const CustomControls = ({ modelRef, mode, minZoom = -5, maxZoom = 1 }) => {
+const CustomControls = ({
+  modelRef,
+  mode,
+  minZoom = -5,
+  maxZoom = 1,
+  watchRef,
+}) => {
   const isDragging = useRef(false);
   const lastMouse = useRef({ x: 0, y: 0 });
-  const { camera } = useThree();
+  const timeoutRef = useRef();
+  const { camera, size, gl, setSize } = useThree();
 
+  useEffect(() => {
+    if (!watchRef?.current) return;
+
+    const observer = new ResizeObserver(() => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        const { width, height } = watchRef.current.getBoundingClientRect();
+        setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        gl.setSize(width, height);
+      }, 1); // adjust timing as needed
+    });
+
+    observer.observe(watchRef.current);
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeoutRef.current);
+    };
+  }, [watchRef, setSize, camera, gl]);
   useEffect(() => {
     const target = document.querySelector("#canvas-container");
 

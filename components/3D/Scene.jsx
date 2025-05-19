@@ -13,6 +13,19 @@ import CustomControls from "./CustomControls";
 import useHistoryStore from "@/store/useHistoryStore";
 import useExportStore from "@/store/useExportStore";
 
+const getCanvasWidth = (backgroundRatio) => {
+  switch (backgroundRatio) {
+    case "16:9":
+      return "100%";
+    case "1:1":
+      return "50%";
+    case "9:16":
+      return "30%";
+    default:
+      return "100%";
+  }
+};
+
 const RotateModel = ({ modelRef }) => {
   const { state } = useHistoryStore();
   const { cameraAnimation } = state;
@@ -84,19 +97,6 @@ export default function Scene() {
     });
   }, [textureUrl]);
 
-  const getCanvasWidth = () => {
-    switch (backgroundRatio) {
-      case "16:9":
-        return "100%";
-      case "1:1":
-        return "50%";
-      case "9:16":
-        return "30%";
-      default:
-        return "100%";
-    }
-  };
-
   // 🟡 takeSS with type-based target
   const takeSS = async (type = "jpeg") => {
     const selector = type === "png" ? "#canvas-only" : "#canvas-container";
@@ -137,47 +137,81 @@ export default function Scene() {
   };
 
   const recordVideoFromCanvas = (format) => {
-    requestAnimationFrame(() => {
-      const canvas =
-        format === "MP4"
-          ? document.querySelector("#canvas-container canvas")
-          : document.querySelector("#canvas-only");
+    const sourceCanvas = document.querySelector("#canvas-container canvas");
+    const width = sourceCanvas.width;
+    const height = sourceCanvas.height;
 
-      if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
-        console.error("Canvas element not found or invalid.");
-        return;
-      }
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const ctx = tempCanvas.getContext("2d");
 
-      if (typeof canvas.captureStream !== "function") {
-        console.error("captureStream() is not supported on this canvas.");
-        return;
-      }
+    let animationFrameId;
+    let img;
 
-      const stream = canvas.captureStream(30); // 30 FPS
-      const chunks = [];
-      const recorder = new MediaRecorder(stream, {
-        mimeType: "video/webm;codecs=vp9",
-      });
-
-      recorderRef.current = recorder;
-      setIsRecording(true);
-
-      recorder.ondataavailable = (e) => chunks.push(e.data);
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "video/webm" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `export-video.${format.toLowerCase()}`;
-        a.click();
-
-        // Reset
-        recorderRef.current = null;
-        setIsRecording(false);
-      };
-
-      recorder.start();
+    const stream = tempCanvas.captureStream(30);
+    const chunks = [];
+    const recorder = new MediaRecorder(stream, {
+      mimeType: "video/webm;codecs=vp9",
     });
+
+    const renderFrame = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      if (format === "MP4") {
+        if (backgroundType === "color") {
+          console.log("Rendering background color");
+          ctx.fillStyle = backgroundColor || "#ffffff";
+          ctx.fillRect(0, 0, width, height);
+        }
+
+        if (backgroundType === "image" && img?.complete) {
+          ctx.drawImage(img, 0, 0, width, height);
+        }
+      }
+
+      try {
+        ctx.drawImage(sourceCanvas, 0, 0); // WebGL content
+      } catch (err) {
+        console.warn("Canvas drawImage failed:", err);
+      }
+
+      animationFrameId = requestAnimationFrame(renderFrame);
+    };
+
+    recorder.ondataavailable = (e) => chunks.push(e.data);
+    recorder.onstop = () => {
+      cancelAnimationFrame(animationFrameId);
+
+      const blob = new Blob(chunks, { type: "video/webm" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `export-video.webm`;
+      a.click();
+
+      recorderRef.current = null;
+      setIsRecording(false);
+    };
+
+    recorderRef.current = recorder;
+    setIsRecording(true);
+
+    // Optional: preload image
+    if (format === "MP4" && backgroundType === "image") {
+      img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = backgroundImage;
+      img.onload = () => {
+        renderFrame();
+        recorder.start();
+        setTimeout(() => recorder.stop(), 5000);
+      };
+    } else {
+      renderFrame();
+      recorder.start();
+      setTimeout(() => recorder.stop(), 5000);
+    }
   };
 
   const handleMP4Download = () => {
@@ -226,7 +260,7 @@ export default function Scene() {
           ref={canvasWrapperRef}
           id="canvas-container"
           style={{
-            width: getCanvasWidth(),
+            width: getCanvasWidth(backgroundRatio),
             height: "100%",
             backgroundColor:
               backgroundType === "color" ? backgroundColor : "transparent",
@@ -246,7 +280,11 @@ export default function Scene() {
                 castShadow
               />
               <Environment files={"/env/lebombo_1k.hdr"} />
-              <CustomControls modelRef={modelRef} mode={activeMode} />
+              <CustomControls
+                watchRef={canvasWrapperRef}
+                modelRef={modelRef}
+                mode={activeMode}
+              />
 
               {/* <OrbitControlsWrapper modelRef={modelRef} mode={activeMode} /> */}
               <Suspense fallback={<Loader />}>

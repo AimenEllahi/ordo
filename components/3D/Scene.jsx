@@ -12,6 +12,7 @@ import html2canvas from "html2canvas-pro";
 import CustomControls from "./CustomControls";
 import useHistoryStore from "@/store/useHistoryStore";
 import useExportStore from "@/store/useExportStore";
+import { Model } from "./Tshirt_V10";
 
 const getCanvasWidth = (backgroundRatio) => {
   switch (backgroundRatio) {
@@ -290,7 +291,9 @@ export default function Scene() {
               <Suspense fallback={<Loader />}>
                 <group position-z={4}>
                   <group ref={modelRef}>
-                    <NewShirt textures={textures} />
+                    <Model textures={textures} />
+
+                    {/* <NewShirt textures={textures} /> */}
                   </group>
                 </group>
               </Suspense>

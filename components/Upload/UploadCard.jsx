@@ -17,7 +17,7 @@ import useImageStore from "@/store/useImageStore";
 import { twMerge } from "tailwind-merge";
 import useHistoryStore from "@/store/useHistoryStore";
 import useExportStore from "@/store/useExportStore";
-import { debounce } from "lodash";
+import { debounce, set } from "lodash";
 
 const UploadCard = ({ isActive }) => {
   const fileInputRef = useRef(null);
@@ -102,66 +102,56 @@ const UploadCard = ({ isActive }) => {
   const handleAddImage = (image) => {
     FabricImage.fromURL(image).then((img) => {
       const area = areaRef.current?.front; // Example: Assigning images to the 'front' area
+      // Calculate scale to fit image within area while preserving aspect ratio
+      const maxWidth = area?.width || 300;
+      const maxHeight = area?.height || 300;
+
+      const scaleX = maxWidth / img.width;
+      const scaleY = maxHeight / img.height;
+      const scale = Math.min(scaleX, scaleY); // scale to fit while preserving ratio
 
       img.set({
-        left: area?.x,
-        top: area?.y,
+        scaleX: scale,
+        scaleY: scale,
+        left: area?.x || 0,
+        top: area?.y || 0,
         cornerSize: 30,
         cornerStrokeWidth: 2,
         transparentCorners: false,
       });
       img.toObject = () => ({ ...img.toObject(), id: url });
 
-      //Add custom delete control
+      const scaledHeight = img.getScaledHeight();
+
       img.controls.deleteControl = new Control({
-        x: 0.95,
-        y: -0.7,
-        offsetY: 0,
-        offsetX: -img.getScaledWidth() / 2,
-
+        x: 0.1, // Top-center
+        y: -0.5,
+        offsetY: -(scaledHeight / 2) * 0.1, // 20px above top edge
         cursorStyle: "pointer",
-        // mouseDownHandler: (eventData, transform) => {
-        //   console.log("Delete icon clicked 2");
-        // },
-
-        actionHandler: (eventData, transformer, x, y) => {
-          console.log("Delete icon clicked");
-          const target = transformer.target;
+        mouseUpHandler: (eventData, transform) => {
+          const target = transform.target;
           const canvas = target.canvas;
           canvas.remove(target);
           canvas.requestRenderAll();
+          setTimeout(() => generateTexture(), 100);
+          return true;
         },
-        render: renderDeleteIcon,
+        render: (ctx, left, top) => {
+          const size = 40;
+          const icon = document.getElementById("deleteIcon");
+          if (!icon) return;
+
+          ctx.save();
+          ctx.translate(left, top); // 'left' and 'top' are based on x/y + offsetY
+          ctx.drawImage(icon, -size / 2, -size / 2, size, size);
+          ctx.restore();
+        },
       });
 
       fabricCanvas.current.add(img);
       fabricCanvas.current.renderAll();
       generateTexture();
     });
-  };
-  function renderDeleteIcon(ctx, left, top, styleOverride, fabricObject) {
-    const sizeX = 75; // Increase the size of the icon
-    const sizeY = 100; // Increase the size of the icon
-
-    ctx.fillRect(left, top, sizeX, sizeY); // Draw the icon background
-
-    ctx.drawImage(
-      document.getElementById("deleteIcon"),
-      left,
-      top,
-      sizeX,
-      sizeY
-    );
-  }
-  const deleteImage = (url) => {
-    const object = fabricCanvas.current
-      .getObjects()
-      .find((obj) => obj.id === url);
-    if (object) {
-      fabricCanvas.current.remove(object);
-      fabricCanvas.current.renderAll();
-      removeImage(url); // Update state to remove image
-    }
   };
 
   const drawAreaBorders = () => {
@@ -230,6 +220,7 @@ const UploadCard = ({ isActive }) => {
     canvas.set({
       controlsAboveOverlay: true,
     });
+    // drawAreaBorders();
 
     canvas.on("object:moving", () => {
       generateTexture();
@@ -337,7 +328,6 @@ const UploadCard = ({ isActive }) => {
             "mt-10   max-h-[300px] max-w-[372px] relative rounded-lg"
           )}
         >
-          {" "}
           <img
             src="uploadposition.png"
             alt="Template"

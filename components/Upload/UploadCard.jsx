@@ -283,8 +283,8 @@ const UploadCard = ({ isActive }) => {
         area.y,
         area.width,
         area.height,
-        0,
-        0,
+        10,
+        10,
         area.width,
         area.height
       );
@@ -301,6 +301,7 @@ const UploadCard = ({ isActive }) => {
     >
       <div className={twMerge("w-[372px] h-[460px] overflow-hidden")}>
         <Title>Upload Image/SVG</Title>
+
         <p className="font-medium text-md mt-1 text-gray-400">
           Upload an image and move it on the template below to display on the
           model
@@ -339,9 +340,9 @@ const UploadCard = ({ isActive }) => {
             className=" max-h-[300px] max-w-[372px]  "
           ></canvas>
           <img
+            className=""
             id="deleteIcon"
             src="/icons/Icon.png"
-            className="hidden"
             alt="delete icon"
           />
         </div>

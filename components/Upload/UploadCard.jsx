@@ -26,10 +26,10 @@ const UploadCard = ({ isActive }) => {
   const areaRef = useRef(null);
   const heic2anyRef = useRef(null);
 
-  const { setTextureUrl, addImage, removeImage } = useImageStore();
+  const { addImage, removeImage } = useImageStore();
   const { isExportModalOpen } = useExportStore();
   const state = useHistoryStore().getState();
-  const _useHistoryStore = useHistoryStore();
+  const { setTextureUrl } = useHistoryStore();
 
   useEffect(() => {
     async function loadDependencies() {
@@ -248,9 +248,9 @@ const UploadCard = ({ isActive }) => {
     return () => canvas.dispose();
   }, []);
 
-  useEffect(() => {
-    generateTexture();
-  }, [state]);
+  // useEffect(() => {
+  //   generateTexture();
+  // }, [state]);
   useEffect(() => {
     setTimeout(() => {
       generateTexture();

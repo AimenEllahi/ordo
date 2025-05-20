@@ -1,5 +1,12 @@
 import { create } from "zustand";
 
+const emptyTexture = {
+  front: null,
+  back: null,
+  collar: null,
+  leftShoulder: null,
+  rightShoulder: null,
+};
 const defaultState = {
   backgroundColor: "#818181",
   backgroundImage: null,
@@ -13,6 +20,8 @@ const defaultState = {
   collarColor: "#FFFFFF",
   leftShoulderColor: "#FFFFFF",
   rightShoulderColor: "#FFFFFF",
+
+  textureObjects: [emptyTexture], // initial snapshot
 };
 
 const useHistoryStore = create((set, get) => ({
@@ -73,13 +82,21 @@ const useHistoryStore = create((set, get) => ({
 
   setUploadedImages: (images) => set({ uploadedImages: images }),
 
-  setTextureUrl: (areaKey, dataURL) =>
-    set((state) => ({
-      textureUrl: {
-        ...state.textureUrl,
-        [areaKey]: dataURL,
-      },
-    })),
+  setTextureUrl: (areaKey, dataURL) => {
+    const current = get().state.textureObjects;
+    const lastSnapshot = current[current.length - 1] || emptyTexture;
+
+    const newSnapshot = {
+      ...lastSnapshot,
+      [areaKey]: dataURL,
+    };
+
+    const updatedTextures = [...current, newSnapshot];
+    console.log("Updated Textures:", updatedTextures);
+    get().setState({
+      textureObjects: updatedTextures,
+    });
+  },
 }));
 
 export default useHistoryStore;

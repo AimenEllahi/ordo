@@ -248,9 +248,22 @@ const UploadCard = ({ isActive }) => {
     return () => canvas.dispose();
   }, []);
 
-  // useEffect(() => {
-  //   generateTexture();
-  // }, [state]);
+  useEffect(() => {
+    generateTexture();
+  }, [
+    state.backgroundColor,
+    state.backgroundImage,
+    state.backgroundType,
+    state.backgroundRatio,
+    state.cameraAnimation,
+    state.activeMode,
+    state.garmentColor,
+    state.frontColor,
+    state.backColor,
+    state.collarColor,
+    state.leftShoulderColor,
+    state.rightShoulderColor,
+  ]);
   useEffect(() => {
     setTimeout(() => {
       generateTexture();
@@ -261,6 +274,7 @@ const UploadCard = ({ isActive }) => {
     if (!fabricCanvas.current || !areaRef.current) return;
 
     Object.keys(areaRef.current).forEach((areaKey) => {
+      console.log(areaKey, "areaKey");
       const area = areaRef.current[areaKey];
       const textureCanvas = document.createElement("canvas");
 

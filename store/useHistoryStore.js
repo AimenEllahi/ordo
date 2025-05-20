@@ -1,5 +1,5 @@
 import { create } from "zustand";
-
+let debounceTimer = null;
 const emptyTexture = {
   front: null,
   back: null,
@@ -20,6 +20,7 @@ const defaultState = {
   collarColor: "#FFFFFF",
   leftShoulderColor: "#FFFFFF",
   rightShoulderColor: "#FFFFFF",
+  animation: "Pose",
 
   textureObjects: [emptyTexture], // initial snapshot
 };
@@ -69,6 +70,18 @@ const useHistoryStore = create((set, get) => ({
     });
   },
 
+  setAnimation: (animation) => {
+    const { state } = get();
+    const newState = { ...state, animation };
+    set((prevState) => ({
+      history: [...prevState.history, prevState.state],
+      future: [],
+      state: newState,
+    }));
+  },
+
+
+
   // ---- Image-related methods ----
   addImage: (image) =>
     set((state) => ({
@@ -83,19 +96,31 @@ const useHistoryStore = create((set, get) => ({
   setUploadedImages: (images) => set({ uploadedImages: images }),
 
   setTextureUrl: (areaKey, dataURL) => {
-    const current = get().state.textureObjects;
-    const lastSnapshot = current[current.length - 1] || emptyTexture;
+    const store = get();
+    const currentTextures = store.state.textureObjects;
+    const lastSnapshot = currentTextures[currentTextures.length - 1] || {
+      ...emptyTexture,
+    };
 
+    // Create a new snapshot with updated area
     const newSnapshot = {
       ...lastSnapshot,
       [areaKey]: dataURL,
     };
 
-    const updatedTextures = [...current, newSnapshot];
-    console.log("Updated Textures:", updatedTextures);
-    get().setState({
-      textureObjects: updatedTextures,
-    });
+    // Append new snapshot to textureObjects
+    const updatedTextures = [...currentTextures, newSnapshot];
+
+    return set((state) => ({
+      state: {
+        ...state.state,
+        textureObjects: updatedTextures,
+      },
+      textureUrl: {
+        ...state.textureUrl,
+        [areaKey]: dataURL,
+      },
+    }));
   },
 }));
 

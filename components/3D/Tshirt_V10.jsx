@@ -22,7 +22,9 @@ export function Model({ textures }) {
     frontColor,
     leftShoulderColor,
     rightShoulderColor,
+    animation,
   } = useHistoryStore().state;
+  
   let frontMaterial = materials["fab.007"].clone();
   const backMaterial = materials["fab.007"].clone();
   const collarMaterial = materials["fab.007"].clone();
@@ -58,7 +60,6 @@ export function Model({ textures }) {
     const matMap = {
       front: frontMaterial,
       back: backMaterial,
-
       leftSleeve: leftShoulderMaterial,
       rightSleeve: rightShoulderMaterial,
     };
@@ -66,22 +67,22 @@ export function Model({ textures }) {
     Object.keys(textures).forEach((key) => {
       const texture = textures[key];
       if (texture && matMap[key]) {
-        //texture.flipY = false;
         texture.needsUpdate = true;
         applyUnblendedMap(matMap[key], texture);
       }
     });
   }, [textures]);
 
-  // Set the initial animation to play
-  React.useEffect(() => {
-    if (actions) {
-      // console.log("Actions: ", actions);
-      //set the animation to loop
-      actions["Pose"].setLoop(THREE.LoopRepeat, Infinity);
-      actions["Pose"].play();
-    }
-  }, [actions]);
+  useEffect(() => {
+    if (!actions || !actions[animation]) return;
+
+    const action = actions[animation];
+    action.reset().setLoop(THREE.LoopRepeat, Infinity).play();
+
+    return () => {
+      action.stop(); // optional cleanup
+    };
+  }, [actions, animation]);
 
   return (
     <group scale={0.0013} position-y={-1.65} ref={group} dispose={null}>

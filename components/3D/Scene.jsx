@@ -46,12 +46,10 @@ const RotateModel = ({ modelRef }) => {
 };
 
 export default function Scene() {
-  const { textureUrl } = useImageStore();
   const [isRecording, setIsRecording] = useState(false);
   const recorderRef = useRef(null); // to hold MediaRecorder instance
 
   const { isExportModalOpen, setIsExportModalOpen } = useExportStore();
-  const groupRef = useRef();
 
   const [textures, setTextures] = useState({});
   const [modelLoaded, setModelLoaded] = useState(false);
@@ -69,14 +67,16 @@ export default function Scene() {
   } = state;
 
   useEffect(() => {
-    const textureKeys = Object.keys(textureUrl);
+    if (!state.textureObjects) return;
+    const _textureUrl = state.textureObjects.pop();
+    const textureKeys = Object.keys(_textureUrl);
     if (textureKeys.length === 0) {
       setModelLoaded(true);
       return;
     }
 
     textureKeys.forEach((key) => {
-      const url = textureUrl[key];
+      const url = _textureUrl[key];
       if (url) {
         const image = new Image();
         image.src = url;
@@ -96,7 +96,7 @@ export default function Scene() {
         };
       }
     });
-  }, [textureUrl]);
+  }, [state.textureObjects]);
 
   // 🟡 takeSS with type-based target
   const takeSS = async (type = "jpeg") => {

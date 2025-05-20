@@ -17,7 +17,9 @@ export default function OptionCard({
       >
         <img src={imgUrl} alt={name} className="w-[500px] object-contain" />
       </div>
-      <p className="text-sm font-semibold w-3/4 text-wrap ">{name}</p>
+      <p className="text-sm font-semibold w-3/4 text-wrap capitalize ">
+        {name}
+      </p>
     </div>
   );
 }

@@ -141,7 +141,7 @@ const Sidebar = () => {
           onClick={() => setIsExportModalOpen(true)}
           text="Export"
           icon={<ExportIcon />}
-          className=" w-full mt-4 flex justify-center items-center"
+          className=" w-full mt-4 flex justify-center items-center anton-sc-regular font-thin"
           variant={2}
         />
 

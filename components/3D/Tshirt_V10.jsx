@@ -12,7 +12,7 @@ import useHistoryStore from "@/store/useHistoryStore";
 export function Model({ textures }) {
   const group = React.useRef();
   const { nodes, materials, animations } = useGLTF(
-    "/models/Tshirt_V10-transformed.glb"
+    "/Tshirt_V10-transformed.glb"
   );
   const { actions } = useAnimations(animations, group);
   const {
@@ -24,7 +24,7 @@ export function Model({ textures }) {
     rightShoulderColor,
     animation,
   } = useHistoryStore().state;
-  
+
   let frontMaterial = materials["fab.007"].clone();
   const backMaterial = materials["fab.007"].clone();
   const collarMaterial = materials["fab.007"].clone();
@@ -224,4 +224,4 @@ export function Model({ textures }) {
   );
 }
 
-useGLTF.preload("/models/Tshirt_V10-transformed.glb");
+useGLTF.preload("/Tshirt_V10-transformed.glb");

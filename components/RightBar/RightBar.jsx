@@ -7,7 +7,7 @@ import useHistoryStore from "@/store/useHistoryStore";
 
 const RightBar = () => {
   const { state, setState, undo, redo, history, future } = useHistoryStore();
-
+  console.log(history, future);
   return (
     <div className="fixed z-50 right-4 items-center justify-center gap-3 top-1/4 -translate-y-1/2 flex flex-col p-2 py-3 rounded-xl shadow-md bg-white">
       <button

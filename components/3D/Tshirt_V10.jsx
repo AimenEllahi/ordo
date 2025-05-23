@@ -32,8 +32,10 @@ export function Model({ textures }) {
   const rightShoulderMaterial = materials["fab.007"].clone();
   const innerMaterial = materials["fab.007"].clone();
 
-  const applyUnblendedMap = (material, texture) => {
+  const applyUnblendedMap = (material, texture, color) => {
     material.map = texture;
+    material.color = new THREE.Color(color);
+
     material.transparent = true;
     material.alphaTest = 0.5;
     // Force shader features to be included
@@ -63,15 +65,31 @@ export function Model({ textures }) {
       leftSleeve: leftShoulderMaterial,
       rightSleeve: rightShoulderMaterial,
     };
-
+    const colorMap = {
+      front: frontColor,
+      back: backColor,
+      leftSleeve: leftShoulderColor,
+      rightSleeve: rightShoulderColor,
+      collar: collarColor,
+    };
     Object.keys(textures).forEach((key) => {
       const texture = textures[key];
       if (texture && matMap[key]) {
         texture.needsUpdate = true;
-        applyUnblendedMap(matMap[key], texture);
+
+        applyUnblendedMap(matMap[key], texture, colorMap[key]);
       }
     });
-  }, [textures]);
+  }, [
+    textures,
+
+    garmentColor,
+    backColor,
+
+    frontColor,
+    leftShoulderColor,
+    rightShoulderColor,
+  ]);
 
   useEffect(() => {
     if (!actions || !actions[animation]) return;
@@ -84,6 +102,7 @@ export function Model({ textures }) {
     };
   }, [actions, animation]);
 
+
   return (
     <group scale={0.0013} position-y={-1.65} ref={group} dispose={null}>
       <group name="Scene">
@@ -91,7 +110,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node003"
           geometry={nodes.Pattern_740043_Node003.geometry}
           material={collarMaterial}
-          material-color={collarColor}
+          //material-color={collarColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node003.morphTargetDictionary
           }
@@ -115,7 +134,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node002"
           geometry={nodes.Pattern_740043_Node002.geometry}
           material={backMaterial}
-          material-color={backColor}
+          //material-color={backColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node002.morphTargetDictionary
           }
@@ -127,7 +146,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node004"
           geometry={nodes.Pattern_740043_Node004.geometry}
           material={frontMaterial}
-          material-color={frontColor}
+          //material-color={frontColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node004.morphTargetDictionary
           }
@@ -139,7 +158,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node005"
           geometry={nodes.Pattern_740043_Node005.geometry}
           material={leftShoulderMaterial}
-          material-color={leftShoulderColor}
+          //material-color={leftShoulderColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node005.morphTargetDictionary
           }
@@ -151,7 +170,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node006"
           geometry={nodes.Pattern_740043_Node006.geometry}
           material={leftShoulderMaterial}
-          material-color={leftShoulderColor}
+          //material-color={leftShoulderColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node006.morphTargetDictionary
           }
@@ -163,7 +182,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node007"
           geometry={nodes.Pattern_740043_Node007.geometry}
           material={leftShoulderMaterial}
-          material-color={leftShoulderColor}
+          //material-color={leftShoulderColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node007.morphTargetDictionary
           }
@@ -175,7 +194,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node008"
           geometry={nodes.Pattern_740043_Node008.geometry}
           material={rightShoulderMaterial}
-          material-color={rightShoulderColor}
+          //material-color={rightShoulderColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node008.morphTargetDictionary
           }
@@ -187,7 +206,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node009"
           geometry={nodes.Pattern_740043_Node009.geometry}
           material={rightShoulderMaterial}
-          material-color={rightShoulderColor}
+          //material-color={rightShoulderColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node009.morphTargetDictionary
           }
@@ -199,7 +218,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node010"
           geometry={nodes.Pattern_740043_Node010.geometry}
           material={rightShoulderMaterial}
-          material-color={rightShoulderColor}
+          //material-color={rightShoulderColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node010.morphTargetDictionary
           }
@@ -211,7 +230,7 @@ export function Model({ textures }) {
           name="Pattern_740043_Node011"
           geometry={nodes.Pattern_740043_Node011.geometry}
           material={collarMaterial}
-          material-color={collarColor}
+          //material-color={collarColor}
           morphTargetDictionary={
             nodes.Pattern_740043_Node011.morphTargetDictionary
           }

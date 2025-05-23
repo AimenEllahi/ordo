@@ -10,7 +10,7 @@ import useHistoryStore from "@/store/useHistoryStore";
 export default function FabricCanvas({ onUpdate }) {
   const canvasRef = useRef(null);
   const fabricCanvas = useRef(null);
-  const { uploadedImages } = useHistoryStore();
+  const { uploadedImages, state, setState } = useHistoryStore();
   const uploadedImage = uploadedImages[0];
 
   useEffect(() => {

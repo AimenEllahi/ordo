@@ -66,9 +66,10 @@ export default function Scene() {
     activeMode,
   } = state;
 
+  console.log(state);
   useEffect(() => {
-    if (!state.textureObjects) return;
-    const _textureUrl = state.textureObjects.pop();
+    if (!state.textureUrl) return;
+    const _textureUrl = state.textureUrl;
     const textureKeys = Object.keys(_textureUrl);
     if (textureKeys.length === 0) {
       setModelLoaded(true);
@@ -96,7 +97,7 @@ export default function Scene() {
         };
       }
     });
-  }, [state.textureObjects]);
+  }, [state.textureUrl]);
 
   // 🟡 takeSS with type-based target
   const takeSS = async (type = "jpeg") => {

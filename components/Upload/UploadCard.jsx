@@ -28,7 +28,8 @@ const UploadCard = ({ isActive }) => {
 
   const { addImage, removeImage } = useImageStore();
   const { isExportModalOpen } = useExportStore();
-  const state = useHistoryStore().getState();
+  const { state, setState } = useHistoryStore();
+
   const { setTextureUrl } = useHistoryStore();
 
   useEffect(() => {
@@ -243,27 +244,9 @@ const UploadCard = ({ isActive }) => {
       generateTexture();
     });
 
-    //drawAreaBorders();
-
     return () => canvas.dispose();
   }, []);
 
-  useEffect(() => {
-    generateTexture();
-  }, [
-    state.backgroundColor,
-    state.backgroundImage,
-    state.backgroundType,
-    state.backgroundRatio,
-    state.cameraAnimation,
-    state.activeMode,
-    state.garmentColor,
-    state.frontColor,
-    state.backColor,
-    state.collarColor,
-    state.leftShoulderColor,
-    state.rightShoulderColor,
-  ]);
   useEffect(() => {
     setTimeout(() => {
       generateTexture();
@@ -274,7 +257,7 @@ const UploadCard = ({ isActive }) => {
     if (!fabricCanvas.current || !areaRef.current) return;
 
     Object.keys(areaRef.current).forEach((areaKey) => {
-      console.log(areaKey, "areaKey");
+      console.log(areaKey, "areaKey");                                                          
       const area = areaRef.current[areaKey];
       const textureCanvas = document.createElement("canvas");
 
@@ -305,7 +288,14 @@ const UploadCard = ({ isActive }) => {
 
       const dataURL = textureCanvas.toDataURL("image/png", 1.0);
 
-      setTextureUrl(areaKey, dataURL); // Assume onUpdate can handle key-value pairs
+      setTextureUrl(areaKey, dataURL);
+      setState((prevState) => ({
+        ...prevState,
+        textureUrl: {
+          ...prevState.textureUrl,
+          [areaKey]: dataURL,
+        },
+      }));
     });
   };
 

@@ -21,6 +21,7 @@ const defaultState = {
   leftShoulderColor: "#FFFFFF",
   rightShoulderColor: "#FFFFFF",
   animation: "Pose",
+  textureUrl: emptyTexture,
 
   textureObjects: [emptyTexture], // initial snapshot
 };
@@ -33,7 +34,6 @@ const useHistoryStore = create((set, get) => ({
 
   // Image-related state (from useImageStore)
   uploadedImages: [],
-  textureUrl: {},
 
   // ---- State setters ----
   setState: (newPartialState) => {
@@ -80,8 +80,6 @@ const useHistoryStore = create((set, get) => ({
     }));
   },
 
-
-
   // ---- Image-related methods ----
   addImage: (image) =>
     set((state) => ({
@@ -114,11 +112,11 @@ const useHistoryStore = create((set, get) => ({
     return set((state) => ({
       state: {
         ...state.state,
+        textureUrl: {
+          ...state.state.textureUrl,
+          [areaKey]: dataURL,
+        },
         textureObjects: updatedTextures,
-      },
-      textureUrl: {
-        ...state.textureUrl,
-        [areaKey]: dataURL,
       },
     }));
   },

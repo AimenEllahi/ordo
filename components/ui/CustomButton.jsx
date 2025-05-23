@@ -12,12 +12,12 @@ export default function CustomButton({
     <button
       onClick={onClick}
       className={cn(
-        "  gap-[6px] cursor-pointer p-2.5 flex items-center text-black rounded-[6px] border-black border-[1.5px] font-bold text-lg anton-sc-regular",
+        "  gap-[6px] cursor-pointer p-2.5 flex items-center text-black rounded-[6px] border-black border-[1.5px] font-bold text-lg ",
         variant === 2 && "bg-black text-white",
         className
       )}
     >
-      <span className="uppercase">{text}</span>
+      <span className="uppercase anton-sc-regular">{text}</span>
       {icon}
     </button>
   );

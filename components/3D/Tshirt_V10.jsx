@@ -8,6 +8,7 @@ import React, { useEffect } from "react";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
 import useHistoryStore from "@/store/useHistoryStore";
+import { SRGBColorSpace } from "three";
 
 export function Model({ textures }) {
   const group = React.useRef();
@@ -34,10 +35,13 @@ export function Model({ textures }) {
 
   const applyUnblendedMap = (material, texture, color) => {
     material.map = texture;
+    texture.colorSpace = SRGBColorSpace;
+    texture.needsUpdate = true;
+
     material.color = new THREE.Color(color);
 
     material.transparent = true;
-    material.alphaTest = 0.5;
+    material.alphaTest = 0.8;
     // Force shader features to be included
     material.defines = material.defines || {};
     material.defines.USE_UV = "";
@@ -101,7 +105,6 @@ export function Model({ textures }) {
       action.stop(); // optional cleanup
     };
   }, [actions, animation]);
-
 
   return (
     <group scale={0.0013} position-y={-1.65} ref={group} dispose={null}>

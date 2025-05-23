@@ -102,7 +102,7 @@ const UploadCard = ({ isActive }) => {
 
   const handleAddImage = (image) => {
     FabricImage.fromURL(image).then((img) => {
-      const area = areaRef.current?.front; // Example: Assigning images to the 'front' area
+      const area = areaRef.current?.front;
       // Calculate scale to fit image within area while preserving aspect ratio
       const maxWidth = area?.width || 300;
       const maxHeight = area?.height || 300;
@@ -257,7 +257,7 @@ const UploadCard = ({ isActive }) => {
     if (!fabricCanvas.current || !areaRef.current) return;
 
     Object.keys(areaRef.current).forEach((areaKey) => {
-      console.log(areaKey, "areaKey");                                                          
+      console.log(areaKey, "areaKey");
       const area = areaRef.current[areaKey];
       const textureCanvas = document.createElement("canvas");
 

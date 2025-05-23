@@ -5,7 +5,7 @@ const CustomControls = ({
   modelRef,
   mode,
   minZoom = -5,
-  maxZoom = 1,
+  maxZoom = 0.7,
   watchRef,
 }) => {
   const isDragging = useRef(false);

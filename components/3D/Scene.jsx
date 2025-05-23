@@ -207,12 +207,12 @@ export default function Scene() {
       img.onload = () => {
         renderFrame();
         recorder.start();
-        setTimeout(() => recorder.stop(), 5000);
+        setTimeout(() => recorder.stop(), 60000);
       };
     } else {
       renderFrame();
       recorder.start();
-      setTimeout(() => recorder.stop(), 5000);
+      setTimeout(() => recorder.stop(), 60000);
     }
   };
 

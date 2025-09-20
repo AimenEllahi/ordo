@@ -1,74 +1,37 @@
 'use client';
-import { useMemo, useState } from 'react';
-
-const DEMO_CATALOG = [
-  { sku: 'MOD-1x1', name: '1×1 Module', size: '1×1', fits: ['S','M','L'], price: 19 },
-  { sku: 'MOD-1x2', name: '1×2 Module', size: '1×2', fits: ['M','L'],    price: 29 },
-  { sku: 'MOD-2x2', name: '2×2 Module', size: '2×2', fits: ['L'],        price: 49 },
-];
+import { useMemo } from 'react';
+import { useCustomizerStore, DEMO_CATALOG } from '../store/CustomizerStore';   
 
 export default function Customizer() {
-  const [boxSize, setBoxSize] = useState('S');            // 'S' | 'M' | 'L'
-  const [mode, setMode] = useState('manual');             // 'manual' | 'smart'
-  const [added, setAdded] = useState({});                 // { sku: qty }
-  const [tools, setTools] = useState([{ toolType: 'knife', quantity: 6 }]);
+  const {
+    boxSize, setBoxSize,
+    mode, setMode,
+    added, addModule, removeModule, clearModules,
+    tools, addToolRow, updateTool, removeTool,
+    used, free, subtotal,
+  } = useCustomizerStore();
 
-  const boxCubes = { S: 16, M: 24, L: 32 }[boxSize];
   const palette = useMemo(
     () => DEMO_CATALOG.filter(m => m.fits.includes(boxSize)),
     [boxSize]
   );
 
-  const used = useMemo(
-    () => Object.entries(added).reduce((sum, [sku, qty]) => {
-      const mod = DEMO_CATALOG.find(m => m.sku === sku);
-      if (!mod) return sum;
-      const [w, h] = mod.size.split('×').map(Number);
-      return sum + (w * h) * qty;
-    }, 0),
-    [added]
-  );
-
-  const free = boxCubes - used;
-
-  const addModule = (sku) =>
-    setAdded(prev => ({ ...prev, [sku]: (prev[sku] || 0) + 1 }));
-
-  const removeModule = (sku) =>
-    setAdded(prev => {
-      const next = { ...prev };
-      if (!next[sku]) return prev;
-      next[sku] -= 1;
-      if (next[sku] <= 0) delete next[sku];
-      return next;
-    });
-
-  const clearAll = () => setAdded({});
-
-  const addToolRow = () => setTools(t => [...t, { toolType: 'knife', quantity: 1 }]);
-  const updateTool = (i, patch) => setTools(ts => ts.map((t, idx) => idx === i ? { ...t, ...patch } : t));
-  const removeTool = (i) => setTools(ts => ts.filter((_, idx) => idx !== i));
-
-  const subtotal = Object.entries(added).reduce((sum, [sku, qty]) => {
-    const mod = DEMO_CATALOG.find(m => m.sku === sku);
-    return sum + (mod?.price || 0) * qty;
-  }, 0);
-
   return (
-    <div className="w-full max-h-screen py-8 md:py-10 px-5 md:px-8 flex flex-col">
+    <div className="w-full h-full flex flex-col py-8 md:py-10 px-5 md:px-8">
       {/* Title */}
-      <h2 className="hidden sm:block text-2xl md:text-3xl font-semibold tracking-wide uppercase text-black/90 mb-6 relative">
+      <h2 className="hidden sm:block text-2xl md:text-3xl font-semibold tracking-wide uppercase text-black/90 mb-4 relative">
         ORDO Configurator
         <span className="absolute left-0 -bottom-2 h-[2px] w-20 bg-accent-red" />
       </h2>
 
       {/* Space meter */}
       <div className="flex items-center gap-2 mb-3" role="status" aria-live="polite">
-        <span className="px-2 py-1 text-xs rounded bg-black text-white">Used: {used}</span>
-        <span className="px-2 py-1 text-xs rounded border border-black/10 bg-white">Free: {free}</span>
+        <span className="px-2 py-1 text-xs rounded bg-black text-white">Used: {used()}</span>
+        <span className="px-2 py-1 text-xs rounded border border-black/10 bg-white">Free: {free()}</span>
       </div>
 
-      <div className="w-full md:max-h-[70vh] max-h-[35vh] overflow-y-auto pr-1 flex flex-col gap-3">
+      {/* Scrollable content */}
+      <div className="mt-1 flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-3" style={{ WebkitOverflowScrolling: 'touch' }}>
         {/* Box size */}
         <section className="rounded-2xl border border-black/10 bg-white p-4">
           <div className="text-sm font-medium mb-2">Box</div>
@@ -76,14 +39,14 @@ export default function Customizer() {
             {['S','M','L'].map(sz => (
               <button
                 key={sz}
-                onClick={() => { setBoxSize(sz); clearAll(); }}
+                onClick={() => setBoxSize(sz)}
                 className={`px-3 py-1 text-sm rounded-full border ${boxSize===sz ? 'bg-black text-white' : 'bg-white'}`}
               >
                 {sz === 'S' ? 'Small (16)' : sz === 'M' ? 'Medium (24)' : 'Large (32)'}
               </button>
             ))}
           </div>
-          <button className="mt-3 text-xs underline opacity-70" onClick={clearAll}>Clear modules</button>
+          <button className="mt-3 text-xs underline opacity-70" onClick={clearModules}>Clear modules</button>
         </section>
 
         {/* Mode */}
@@ -131,7 +94,7 @@ export default function Customizer() {
           </section>
         )}
 
-        {/* Smart: simple tools form (no logic yet) */}
+        {/* Smart: simple tools form */}
         {mode === 'smart' && (
           <section className="rounded-2xl border border-black/10 bg-white p-4">
             <div className="text-sm font-medium mb-2">Smart Tools</div>
@@ -140,7 +103,7 @@ export default function Customizer() {
                 <div key={i} className="flex items-center gap-2">
                   <select
                     value={t.toolType}
-                    onChange={(e)=>updateTool(i, { toolType: e.target.value })}
+                    onChange={(e)=>useCustomizerStore.getState().updateTool(i, { toolType: e.target.value })}
                     className="border rounded px-2 py-1 text-sm"
                   >
                     <option value="knife">Knife</option>
@@ -151,7 +114,7 @@ export default function Customizer() {
                     type="number"
                     min={0}
                     value={t.quantity}
-                    onChange={(e)=>updateTool(i, { quantity: Number(e.target.value) })}
+                    onChange={(e)=>useCustomizerStore.getState().updateTool(i, { quantity: Number(e.target.value) })}
                     className="w-20 border rounded px-2 py-1 text-sm"
                   />
                   <button className="px-2 py-1 text-xs rounded border" onClick={()=>removeTool(i)}>Remove</button>
@@ -159,10 +122,7 @@ export default function Customizer() {
               ))}
               <button className="px-2 py-1 text-xs rounded border w-fit" onClick={addToolRow}>+ Add Tool</button>
 
-              <button
-                className="mt-2 px-3 py-2 text-sm rounded bg-black text-white"
-                onClick={()=>alert('Smart placement will come later')}
-              >
+              <button className="mt-2 px-3 py-2 text-sm rounded bg-black text-white" onClick={()=>alert('Smart placement will come later')}>
                 Generate Suggestion
               </button>
             </div>
@@ -182,11 +142,8 @@ export default function Customizer() {
               })}
             </ul>
           )}
-          <div className="text-xs mt-2 opacity-70">Subtotal ~ €{subtotal}</div>
-          <button
-            className="inline-block mt-2 px-3 py-2 text-sm rounded bg-accent-red text-white"
-            onClick={()=>alert('Checkout link will be wired later')}
-          >
+          <div className="text-xs mt-2 opacity-70">Subtotal ~ €{subtotal()}</div>
+          <button className="inline-block mt-2 px-3 py-2 text-sm rounded bg-accent-red text-white" onClick={()=>alert('Checkout link will be wired later')}>
             Push to Cart
           </button>
         </section>

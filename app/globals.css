@@ -1,26 +1,41 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root{
+  --beige-100:#e4ddc3; --beige-200:#e4ddc2; --beige-300:#e3e0c6;
+  --black:#000000; --accent-red:#ad462c; --bordeaux:#964848;
+  --neutral-1:#999966; --neutral-2:#999933; --neutral-3:#666633;
+  --neutral-4:#999999; --neutral-5:#666600; --neutral-6:#996633;
 }
 
 @theme inline {
+  /* existing tokens ... */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* ORDO color tokens */
+  --color-beige-100: var(--beige-100);
+  --color-beige-200: var(--beige-200);
+  --color-beige-300: var(--beige-300);
+  --color-black: var(--black);
+  --color-accent-red: var(--accent-red);
+  --color-bordeaux: var(--bordeaux);
+
+  /* Optional neutrals if you want utilities for them too */
+  --color-neutral-1: var(--neutral-1);
+  --color-neutral-2: var(--neutral-2);
+  --color-neutral-3: var(--neutral-3);
+  --color-neutral-4: var(--neutral-4);
+  --color-neutral-5: var(--neutral-5);
+  --color-neutral-6: var(--neutral-6);
+
+  /* Example custom shadow token */
+  --shadow-subtle: 0 10px 30px 0 rgb(0 0 0 / 0.06);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  :root { --background:#0a0a0a; --foreground:#ededed; }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+body { background: var(--beige-100); color: var(--black); font-family: Arial, Helvetica, sans-serif; }

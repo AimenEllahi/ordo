@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React from "react";
 import Customizer from "./Customizer";
 import { HiOutlinePlus, HiOutlineMinus } from "react-icons/hi2";
@@ -11,23 +11,26 @@ export default function Scene() {
       <div className="w-screen h-screen overflow-x-hidden flex flex-col justify-center items-center md:flex-row bg-beige-100 text-black">
         {/* LEFT: canvas / playfield */}
         <div className="w-screen md:w-[70%] h-[50%] md:h-screen rounded-md relative">
-            <div className="w-full h-full ">
-                   <Canvas >
-                <OrbitControls
-                    enablePan={false}
-                    enableZoom={false}
-                    maxPolarAngle={Math.PI / 2}
-                    minPolarAngle={Math.PI / 2}
-                />
-                <Stage environment="city" adjustCamera={false} contactShadow={{ blur: 2, opacity: 0.5 }} >
-                    <mesh>
-                        <boxGeometry args={[0.5, 0.5, 0.5]} />
-                        <meshStandardMaterial color="orange" />
-                    </mesh>
-                </Stage>
-            
+          <div className="w-full h-full ">
+            <Canvas>
+              <OrbitControls
+                enablePan={false}
+                enableZoom={false}
+                maxPolarAngle={Math.PI / 2}
+                minPolarAngle={Math.PI / 2}
+              />
+              <Stage
+                environment="city"
+                adjustCamera={false}
+                contactShadow={{ blur: 2, opacity: 0.5 }}
+              >
+                <mesh>
+                  <boxGeometry args={[0.5, 0.5, 0.5]} />
+                  <meshStandardMaterial color="orange" />
+                </mesh>
+              </Stage>
             </Canvas>
-            </div>
+          </div>
           {/* Zoom controls */}
           <div className="absolute bottom-5 right-5 flex flex-col gap-4">
             {/* Zoom In */}
@@ -52,8 +55,6 @@ export default function Scene() {
               <HiOutlineMinus className="h-5 w-5" />
             </button>
           </div>
-         
-         
         </div>
 
         {/* RIGHT: panel */}
